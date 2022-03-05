@@ -24,6 +24,10 @@ author:
     organization: Apple Inc.
     email: tpauly@apple.com
 
+    name: Tirumaleswar Reddy
+    organization: Akamai
+    email: kondtir@gmail.com
+
 normative:
 
 informative:
