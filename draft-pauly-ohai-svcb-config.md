@@ -106,7 +106,7 @@ to ensure that implementations that do not understand the key
 do not interpret this service as a generic service.
 
 The presentation value of the SvcParamValue is a single decimal integer
-between 0 and 3 in ASCII. Any other value (e.g. an empty value) is a
+between 0 and 2 in ASCII. Any other value (e.g. an empty value) is a
 syntax error. To enable simpler parsing, this SvcParam MUST NOT contain
 escape sequences.
 
@@ -127,6 +127,8 @@ being described is an Oblivious HTTP service that uses the default
 "message/bhttp" media type {{OHTTP}}
 {{!BINARY-HTTP=I-D.draft-ietf-httpbis-binary-message}}.
 
+TODO: Example
+
 ## Use in DNS server SVCB records
 
 For the "dns" scheme, as defined in {{DNS-SVCB}}, the presence of
@@ -140,6 +142,8 @@ is "application/dns-message" {{!DOH=RFC8484}}.
 Clients can discover an oblivious DNS server configuration using
 DDR, by either querying _dns.resolver.arpa to a locally configured
 resolver or querying using the name of a resolver {{DDR}}.
+
+TODO: Example
 
 In the case of oblivious DNS servers, the client might not be able to
 directly use the verification mechanisms described in {{DDR}}, which
@@ -173,6 +177,19 @@ still need to ensure that they are not being targeted with unique
 key configurations that would reveal their identity. See {{security}} for
 more discussion.
 
+# Configuration Well-Known URI
+
+Once a client has discovered that a service is available as an oblivious
+target, it needs to know the key configuration before sending oblivious
+requests.
+
+This document defines a well-known URI {{!RFC8615}}, "oblivious-configs",
+that allows a target to host its configurations.
+
+TODO: Provide example URI based on SVCB record
+
+TODO: Explain who fetches the config
+
 # Security and Privacy Considerations {#security}
 
 When discovering designated oblivious DNS servers using this mechanism,
@@ -201,7 +218,7 @@ registry ({{SVCB}}).
 
 | Number  | Name           | Meaning                            | Reference       |
 | ------- | -------------- | ---------------------------------- | --------------- |
-| TBD     | oblivious      | Service has an oblivious target    | (This document) |
+| TBD     | oblivious      | Describes if a service has an oblivious target  | (This document) |
 
 ## Well-Known URI
 
