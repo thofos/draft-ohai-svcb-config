@@ -111,7 +111,20 @@ being described is an Oblivious HTTP service that uses the default
 "message/bhttp" media type {{OHTTP}}
 {{!BINARY-HTTP=I-D.draft-ietf-httpbis-binary-message}}.
 
-TODO: Example
+For example, an HTTPS service record for svc.example.com that supports
+an oblivious target could look like this:
+
+~~~
+svc.example.com. 7200  IN HTTPS 1 . alpn=h2,h2 oblivious
+~~~
+
+A similar record for a service that only support oblivious connectivity
+could look like this:
+
+~~~
+oblivious-svc.example.com. 7200  IN HTTPS 1 . (
+    mandatory=oblivious oblivious )
+~~~
 
 ## Use in DNS server SVCB records
 
@@ -127,7 +140,13 @@ Clients can discover an oblivious DNS server configuration using
 DDR, by either querying _dns.resolver.arpa to a locally configured
 resolver or querying using the name of a resolver {{DDR}}.
 
-TODO: Example
+For example, a DoH service advertised over DDR can be annotated
+as supporting oblivious resolution using the following record:
+
+~~~
+_dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
+     alpn=h2 dohpath=/dns-query{?dns} oblivious )
+~~~
 
 In the case of oblivious DNS servers, the client might not be able to
 directly use the verification mechanisms described in {{DDR}}, which
