@@ -193,7 +193,7 @@ more discussion.
 
 # Configuration Well-Known URI
 
-Clients that know a service is available as an oblivious target, e.g., 
+Clients that know a service is available as an oblivious target, e.g.,
 either via discovery through the "oblivious" parameter in a SVCB or HTTPS
 record, or by configuration, need to know the key configuration before sending
 oblivious requests.
