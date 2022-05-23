@@ -182,9 +182,10 @@ more discussion.
 
 # Configuration Well-Known URI
 
-Once a client has discovered that a service is available as an oblivious
-target, it needs to know the key configuration before sending oblivious
-requests.
+Clients that know a service is available as an oblivious target, e.g., 
+either via discovery through the "oblivious" parameter in a SVCB or HTTPS
+record, or by configuration, need to know the key configuration before sending
+oblivious requests.
 
 This document defines a well-known URI {{!RFC8615}}, "oblivious-configs",
 that allows a target to host its configurations.
