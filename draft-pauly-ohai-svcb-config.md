@@ -71,7 +71,7 @@ that can be used to look up key configurations on a service that is known
 to have an oblivious target.
 
 This mechanism does not aid in the discovery of proxies to use to access
-oblivious targets; the configurations of proxies is out of scope for this
+oblivious targets; the configuration of proxies is out of scope for this
 document.
 
 # Conventions and Definitions
@@ -95,7 +95,10 @@ do not try to use the service. Services that include mark oblivious
 support as mandatory can, therefore, indicate that the service might
 not be accessible in a non-oblivious fashion. Services that are
 intended to be accessed either as an oblivious target or directly
-SHOULD NOT mark the "oblivious" parameter as mandatory.
+SHOULD NOT mark the "oblivious" parameter as mandatory. Note that since
+multiple SVCB responses can be provided for a single query, the oblivious
+and non-oblivious versions of a single service can have different SVCB
+records to support different names or properties.
 
 The scheme to use for oblivious requests made to a service depends on
 the scheme of the SVCB record. This document defines the interpretation for
@@ -133,6 +136,14 @@ the "oblivious" parameter means that the DNS server being
 described is an Oblivious DNS over HTTP (DoH) service. The default
 media type expected for use in Oblivious HTTP to DNS resolvers
 is "application/dns-message" {{!DOH=RFC8484}}.
+
+In order for DNS servers to function as oblivious targets, they need
+to be accessible via an oblivious proxy. Encrypted DNS servers
+used with the discovery mechanisms described in this section can
+either be publicly accessible, or specific to a network. In general,
+only publicly accessible DNS servers will work as Oblivious DNS
+servers, unless there is a coordinated deployment with an oblivious
+proxy that is also hosted within a network.
 
 ### Use with DDR {#ddr}
 
@@ -190,7 +201,8 @@ oblivious requests.
 This document defines a well-known URI {{!RFC8615}}, "oblivious-configs",
 that allows a target to host its configurations.
 
-The URI is constructed using the TargetName in the SVCB record.
+The URI is constructed using the TargetName in the associated ServiceMode
+SVCB record.
 
 For example, the URI for the following record:
 
@@ -220,10 +232,18 @@ discussion of avoiding key targeting attacks.
 
 # Security and Privacy Considerations {#security}
 
+Attackers on a network can remove SVCB information from cleartext DNS
+answers that are not protected by DNSSEC {{?DNSSEC=RFC4033}}. This
+can effectively downgrade clients. However, since SVCB indications
+for oblivious support are just hints, a client can mitigate this by
+always checking for oblivious target information. Use of encrypted DNS
+or DNSSEC also can be used as mitigations.
+
 When discovering designated oblivious DNS servers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
 being able to directly check the contents of the target server's TLS
-certificate. See {{ddr}} for more discussion.
+certificate. See {{ddr}} for more discussion, as well as the Security
+Considerations of {{?I-D.ietf-add-svcb-dns}}.
 
 As discussed in {{OHTTP}}, client requests using Oblivious HTTP
 can only be linked by recognizing the key configuration. In order to
@@ -231,11 +251,16 @@ prevent unwanted linkability and tracking, clients using any key
 configuration discovery mechanism need to be concerned with attacks
 that target a specific user or population with a unique key configuration.
 
-There are several approaches clients can use to mitigate key targetting
+There are several approaches clients can use to mitigate key targeting
 attacks. {{?CONSISTENCY=I-D.draft-wood-key-consistency}} provides an analysis
 of the options for ensuring the key configurations are consistent between
 different clients. Clients SHOULD employ some technique to mitigate key
-targetting attack.
+targeting attack.
+
+When clients fetch a target's configuration using the well-known URI,
+they can expose their identity in the form of an IP addres if they do not
+connect via a proxy or some other IP-hiding mechanism. Clients SHOULD
+use a proxy or similar mechanism to avoid exposing client IPs to a target.
 
 # IANA Considerations {#iana}
 
