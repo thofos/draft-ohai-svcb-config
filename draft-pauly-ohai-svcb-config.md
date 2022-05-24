@@ -159,21 +159,11 @@ _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
      alpn=h2 dohpath=/dns-query{?dns} oblivious )
 ~~~
 
-In the case of oblivious DNS servers, the client might not be able to
-directly use the verification mechanisms described in {{DDR}}, which
-rely on checking for known resolver IP addresses or hostnames in TLS
-certificates, since clients do not generally perform TLS with oblivious
-targets. A client MAY perform a direct connection to the oblivious
-target server to do this TLS check, however this may be impossible
-or undesirable if the client does not want to ever expose its IP
-address to the oblivious target. If the client does not use the standard
-DDR verification check, it MUST use some alternate mechanism to verify
-that it should use an oblivious target. For example, the client could have
-a local policy of known oblivious target names that it is allowed to
-use, or the client could coordinate with the oblivious proxy to either
-have the oblivious proxy check the properties of the target's TLS
-certificate or filter to only allow targets known and trusted by the
-proxy.
+Clients still need to perform some verification of oblivious DNS servers,
+such as the TLS certificate check described in {{DDR}}. This certificate
+check can be done when looking up the configuration on the resolver
+using the well-known URI ({{well-known}}), which can either be done
+directly, or via a proxy to avoid exposing client IP addresses.
 
 Clients also need to ensure that they are not being targeted with unique
 key configurations that would reveal their identity. See {{security}} for
@@ -191,7 +181,7 @@ still need to ensure that they are not being targeted with unique
 key configurations that would reveal their identity. See {{security}} for
 more discussion.
 
-# Configuration Well-Known URI
+# Configuration Well-Known URI {#well-known}
 
 Clients that know a service is available as an oblivious target, e.g.,
 either via discovery through the "oblivious" parameter in a SVCB or HTTPS
@@ -255,7 +245,8 @@ There are several approaches clients can use to mitigate key targeting
 attacks. {{?CONSISTENCY=I-D.draft-wood-key-consistency}} provides an analysis
 of the options for ensuring the key configurations are consistent between
 different clients. Clients SHOULD employ some technique to mitigate key
-targeting attack.
+targeting attack. Oblivious targets that are detected to use targeted
+key configurations per-client MUST NOT be used.
 
 When clients fetch a target's configuration using the well-known URI,
 they can expose their identity in the form of an IP addres if they do not
