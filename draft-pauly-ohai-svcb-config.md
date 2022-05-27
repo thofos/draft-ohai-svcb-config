@@ -80,7 +80,7 @@ document.
 
 # The oblivious SvcParamKey
 
-The "oblivious" SvcParamKey {{iana}} is used to indicate that a service
+The "oblivious" SvcParamKey ({{iana}}) is used to indicate that a service
 described in an SVCB record can act as an oblivious target. Clients
 can issue requests to this service through an oblivious proxy once
 they learn the key configuration to use to encrypt messages to the
@@ -91,7 +91,7 @@ parameter MUST be empty.
 
 The "oblivious" parameter can be included in the mandatory parameter
 list to ensure that clients that do not support oblivious access
-do not try to use the service. Services that include mark oblivious
+do not try to use the service. Services that mark oblivious
 support as mandatory can, therefore, indicate that the service might
 not be accessible in a non-oblivious fashion. Services that are
 intended to be accessed either as an oblivious target or directly
