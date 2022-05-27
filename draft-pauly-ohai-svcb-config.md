@@ -2,9 +2,9 @@
 title: "Discovery of Oblivious Services via Service Binding Records"
 abbrev: "Oblivious Services in SVCB"
 category: info
+stream: IETF
 
 docname: draft-pauly-ohai-svcb-config-latest
-ipr: trust200902
 area: "Security"
 workgroup: "Oblivious HTTP Application Intermediation"
 keyword: Internet-Draft
@@ -13,10 +13,9 @@ venue:
   type: "Working Group"
   mail: "ohai@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/ohai/"
+  github: tfpauly/draft-ohai-svcb-config
 
-stand_alone: yes
-smart_quotes: no
-pi: [toc, sortrefs, symrefs]
+v: 3
 
 author:
  -
