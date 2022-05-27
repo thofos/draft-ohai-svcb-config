@@ -248,7 +248,7 @@ targeting attack. Oblivious targets that are detected to use targeted
 key configurations per-client MUST NOT be used.
 
 When clients fetch a target's configuration using the well-known URI,
-they can expose their identity in the form of an IP addres if they do not
+they can expose their identity in the form of an IP address if they do not
 connect via a proxy or some other IP-hiding mechanism. Clients SHOULD
 use a proxy or similar mechanism to avoid exposing client IPs to a target.
 
