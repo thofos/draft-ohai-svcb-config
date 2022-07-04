@@ -173,7 +173,7 @@ _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
 Clients still need to perform some verification of oblivious DNS servers,
 such as the TLS certificate check described in {{DDR}}. This certificate
 check can be done when looking up the configuration on the resolver
-using the well-known URI ({{well-known}}), which can either be done
+using the well-known URI ({{well-known-config}}), which can either be done
 directly, or via a proxy to avoid exposing client IP addresses.
 
 Clients also need to ensure that they are not being targeted with unique
