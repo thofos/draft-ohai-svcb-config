@@ -249,8 +249,13 @@ key configurations per-client MUST NOT be used.
 
 When clients fetch a gateway's configuration using the well-known URI,
 they can expose their identity in the form of an IP address if they do not
-connect via a proxy or some other IP-hiding mechanism. Clients SHOULD
-use a proxy or similar mechanism to avoid exposing client IPs to a gateway.
+connect via a proxy or some other IP-hiding mechanism. In some circumstances,
+this might not be a privacy concern, since revealing that a particular
+client IP address is preparing to use an Oblivious HTTP service can be
+expected. However, if a client is otherwise trying to obfuscate its IP
+address or location (and not merely decouple its specific requests from its
+IP address), a proxy or similar mechanism can be used to fetch the gateway's
+configuration.
 
 # IANA Considerations {#iana}
 
