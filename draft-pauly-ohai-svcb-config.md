@@ -2,9 +2,9 @@
 title: "Discovery of Oblivious Services via Service Binding Records"
 abbrev: "Oblivious Services in SVCB"
 category: info
+stream: IETF
 
 docname: draft-pauly-ohai-svcb-config-latest
-ipr: trust200902
 area: "Security"
 workgroup: "Oblivious HTTP Application Intermediation"
 keyword: Internet-Draft
@@ -13,10 +13,9 @@ venue:
   type: "Working Group"
   mail: "ohai@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/ohai/"
+  github: tfpauly/draft-ohai-svcb-config
 
-stand_alone: yes
-smart_quotes: no
-pi: [toc, sortrefs, symrefs]
+v: 3
 
 author:
  -
@@ -80,7 +79,7 @@ document.
 
 # The oblivious SvcParamKey
 
-The "oblivious" SvcParamKey {{iana}} is used to indicate that a service
+The "oblivious" SvcParamKey ({{iana}}) is used to indicate that a service
 described in an SVCB record can act as an oblivious target. Clients
 can issue requests to this service through an oblivious proxy once
 they learn the key configuration to use to encrypt messages to the
@@ -91,7 +90,7 @@ parameter MUST be empty.
 
 The "oblivious" parameter can be included in the mandatory parameter
 list to ensure that clients that do not support oblivious access
-do not try to use the service. Services that include mark oblivious
+do not try to use the service. Services that mark oblivious
 support as mandatory can, therefore, indicate that the service might
 not be accessible in a non-oblivious fashion. Services that are
 intended to be accessed either as an oblivious target or directly
@@ -249,7 +248,7 @@ targeting attack. Oblivious targets that are detected to use targeted
 key configurations per-client MUST NOT be used.
 
 When clients fetch a target's configuration using the well-known URI,
-they can expose their identity in the form of an IP addres if they do not
+they can expose their identity in the form of an IP address if they do not
 connect via a proxy or some other IP-hiding mechanism. Clients SHOULD
 use a proxy or similar mechanism to avoid exposing client IPs to a target.
 
