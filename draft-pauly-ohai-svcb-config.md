@@ -65,7 +65,7 @@ and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}}.
 The presence of this parameter indicates that a service can act as an oblivious
 gateway; see {{Section 2 of OHTTP}} for a description of oblivious gateway.
 
-This document also defines two well-known URIs {{!RFC8615}}: 
+This document also defines two well-known URIs {{!RFC8615}}:
 
 - "oblivious-configs", which can be used to look up key configurations
 on a host that has been identified as an oblivious gateway using SVCB
