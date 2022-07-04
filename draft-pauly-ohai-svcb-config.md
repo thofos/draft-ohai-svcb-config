@@ -35,9 +35,9 @@ informative:
 --- abstract
 
 This document defines a parameter that can be included in SVCB and HTTPS
-DNS resource records to denote that a service is accessible as an Oblivious
-Gateway Resource, as well as a mechanism to look up oblivious key configurations
-using a well-known URI.
+DNS resource records to denote that a service is accessible using an Oblivious
+Gateway Resource, along with a mechanism to discover the key configuration
+for the resource.
 
 --- middle
 
@@ -65,9 +65,15 @@ and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}}.
 The presence of this parameter indicates that a service can act as an oblivious
 gateway; see {{Section 2 of OHTTP}} for a description of oblivious gateway.
 
-This document also defines a well-known URI {{!RFC8615}}, "oblivious-configs",
-that can be used to look up key configurations on a service that is known
-act as an oblivious gateway.
+This document also defines two well-known URIs {{!RFC8615}}: 
+
+- "oblivious-configs", which can be used to look up key configurations
+on a host that has been identified as an oblivious gateway using SVCB
+records ({{well-known-config}}); and,
+
+- "oblivious-gateway", which can be used to send oblivious gateway requests
+to a host that has been identified as an oblivious gateway using SVCB
+records ({{well-known-gateway}}).
 
 This mechanism does not aid in the discovery of relays to use to access
 oblivious gateways; the configuration of proxies is out of scope for this
@@ -186,20 +192,19 @@ still need to ensure that they are not being targeted with unique
 key configurations that would reveal their identity. See {{security}} for
 more discussion.
 
-# Configuration Well-Known URI {#well-known}
+# Key Configuration Well-Known URI {#well-known-config}
 
-Clients that know a service is available as an oblivious gateway, e.g.,
-either via discovery through the "oblivious-gateway" parameter in a SVCB or HTTPS
-record, or by configuration, need to know the key configuration before sending
-oblivious requests.
+Clients that know a service is available as an oblivious gateway
+via discovery through the "oblivious-gateway" parameter in a SVCB or HTTPS
+record need to know the key configuration before sending oblivious requests.
 
 This document defines a well-known URI {{!RFC8615}}, "oblivious-configs",
 that allows a gateway to host its configurations.
 
-The URI is constructed using the TargetName in the associated ServiceMode
-SVCB record.
+The URI is constructed using the name in the "oblivious-gateway"
+SVCB parameter.
 
-For example, the URI for the following record:
+For example, the configuration URI for the following record:
 
 ~~~
 svc.example.com. 7200  IN HTTPS 1 . (
@@ -208,11 +213,12 @@ svc.example.com. 7200  IN HTTPS 1 . (
 
 would be "https://osvc.example.com/.well-known/oblivious-configs".
 
-As another example, the URI for the following record:
+As another example, the configuration URI for the following record:
 
 ~~~
 _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
-     alpn=h2 dohpath=/dns-query{?dns} oblivious-gateway=odoh.example.net )
+     alpn=h2 dohpath=/dns-query{?dns}
+     oblivious-gateway=odoh.example.net )
 ~~~
 
 would be "https://odoh.example.net/.well-known/oblivious-configs".
@@ -225,6 +231,40 @@ to use this URI to fetch the configuration. They can either fetch it
 directly, or do so via a proxy in order to avoid the server discovering
 information about the client's identity. See {{security}} for more
 discussion of avoiding key targeting attacks.
+
+# Oblivious Gateway Resource Well-Known URI {#well-known-gateway}
+
+Oblivious gateways that are advertised via SVCB or HTTPS records
+need to receive gateway requests (sent from oblivious relays) on
+a particular path. While oblivious gateways in general do not
+require fixed or well-known paths, since they can use ad-hoc
+configurations with clients and relays, gateways discovered using
+the method described in this document need to offer a well-known
+path.
+
+Offering a single, well-known URI for each discovered gateway name allows
+for simpler lookup of associated key configurations, simpler communication
+between clients and relays, and makes client-targeting attacks more
+difficult to execute. See {{security}} for more discussion.
+
+This document defines a well-known URI {{!RFC8615}}, "oblivious-gateway",
+which an oblivious gateway uses to receive gateway requests.
+
+The URI is constructed using the name in the "oblivious-gateway"
+SVCB parameter.
+
+For example, the oblivious request URI for the following record:
+
+~~~
+svc.example.com. 7200  IN HTTPS 1 . (
+     alpn=h2 oblivious-gateway=osvc.example.com )
+~~~
+
+would be "https://osvc.example.com/.well-known/oblivious-gateway".
+
+Request to this resource are expected to use the content type
+"message/ohttp-req", and responses are expected to use "message/ohttp-res",
+as defined in {{OHTTP}}.
 
 # Security and Privacy Considerations {#security}
 
@@ -254,6 +294,17 @@ different clients. Clients SHOULD employ some technique to mitigate key
 targeting attack. Oblivious gateways that are detected to use targeted
 key configurations per-client MUST NOT be used.
 
+Oblivious gateways that are accessed based on SVCB discovery are required
+to offer a well-known oblivious gateway request path. This is done in
+part to make client-targeting attacks more difficult. If the gateway request
+path is communicated in the SVCB parameters, individual clients could
+receive unique paths which could be used to identify them upon making
+requests via a relay. While it is still possible for different clients to
+receive different gateway names, this requires provisioning more gateway
+names (which has overhead in DNS configuration and TLS certificate
+generation), and allows relays to more easily enforce allow-lists of
+known gateway names without needing to also check request paths.
+
 When clients fetch a gateway's configuration using the well-known URI,
 they can expose their identity in the form of an IP address if they do not
 connect via a proxy or some other IP-hiding mechanism. Clients SHOULD
@@ -270,11 +321,25 @@ registry ({{SVCB}}).
 | ------- | -------------- | ---------------------------------- | --------------- |
 | TBD     | oblivious-gateway | Defines an oblivious HTTP gateway to use to access this resource  | (This document) |
 
-## Well-Known URI
+## Well-Known URIs
 
-IANA is requested to add a new entry in the "Well-Known URIs" registry {{!RFC8615}} with the following information:
+IANA is requested to add two new entries in the "Well-Known URIs" registry {{!RFC8615}}.
+
+### oblivious-configs
 
 URI suffix: oblivious-configs
+
+Change controller: IETF
+
+Specification document: This document
+
+Status: permanent
+
+Related information: N/A
+
+### oblivious-gateway
+
+URI suffix: oblivious-gateway
 
 Change controller: IETF
 
