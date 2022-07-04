@@ -77,38 +77,42 @@ document.
 
 {::boilerplate bcp14-tagged}
 
-# The oblivious SvcParamKey
+# The oblivious-gateway SvcParamKey
 
-The "oblivious" SvcParamKey ({{iana}}) is used to indicate that a service
-described in an SVCB record can act as an oblivious gateway resource. Clients
-can issue requests to this service through an oblivious relay once
-they learn the key configuration to use to encrypt messages to the
-oblivious gateway.
+The "oblivious-gateway" SvcParamKey ({{iana}}) is used to indicate that a
+service described in an SVCB record can be accessed using a specific oblivious
+gateway resource. Clients can issue requests to this gateway through an
+oblivious relay once they learn the key configuration to use to encrypt
+messages to the oblivious gateway.
 
-Both the presentation and wire format values for the "oblivious"
-parameter MUST be empty.
+The presentation format of the "oblivious-gateway" parameter is a
+comma-separated list of one or more hostnames. The wire format consists
+of one or more hostnames, each prefixed by its length as a single octet,
+with these length-value pairs concatenated to form the SvcParamValue.
+These pairs MUST exactly fill the SvcParamValue; otherwise, the SvcParamValue
+is malformed.
 
-The "oblivious" parameter can be included in the mandatory parameter
+The "oblivious-gateway" parameter can be included in the mandatory parameter
 list to ensure that clients that do not support oblivious access
-do not try to use the service. Services that mark oblivious
-support as mandatory can, therefore, indicate that the service might
+do not try to use the service. Services that mark the oblivious-gateway
+parameter as mandatory can, therefore, indicate that the service might
 not be accessible in a non-oblivious fashion. Services that are
 intended to be accessed either with an oblivious gateway or directly
-SHOULD NOT mark the "oblivious" parameter as mandatory. Note that since
+SHOULD NOT mark the "oblivious-gateway" parameter as mandatory. Note that since
 multiple SVCB responses can be provided for a single query, the oblivious
 and non-oblivious versions of a single service can have different SVCB
 records to support different names or properties.
 
-The scheme to use for oblivious requests made to a service depends on
-the scheme of the SVCB record. This document defines the interpretation for
-the "https" {{SVCB}} and "dns" {{!DNS-SVCB=I-D.draft-ietf-add-svcb-dns}}
+The media type to use for encapsulated requests made to a target service
+depends on the scheme of the SVCB record. This document defines the
+interpretation for the "https" {{SVCB}} and "dns" {{!DNS-SVCB=I-D.draft-ietf-add-svcb-dns}}
 schemes. Other schemes that want to use this parameter MUST define the
 interpretation and meaning of the configuration.
 
 ## Use in HTTPS service records
 
 For the "https" scheme, which uses the HTTPS RR type instead of SVCB,
-the presence of the "oblivious" parameter means that the service
+the presence of the "oblivious-gateway" parameter means that the target
 being described is an Oblivious HTTP service that uses the default
 "message/bhttp" media type {{OHTTP}}
 {{!BINARY-HTTP=I-D.draft-ietf-httpbis-binary-message}}.
@@ -117,21 +121,22 @@ For example, an HTTPS service record for svc.example.com that supports
 an oblivious gateway could look like this:
 
 ~~~
-svc.example.com. 7200  IN HTTPS 1 . alpn=h2,h2 oblivious
+svc.example.com. 7200  IN HTTPS 1 . (
+     alpn=h2 oblivious-gateway=osvc.example.com )
 ~~~
 
 A similar record for a service that only support oblivious connectivity
 could look like this:
 
 ~~~
-oblivious-svc.example.com. 7200  IN HTTPS 1 . (
-    mandatory=oblivious oblivious )
+svc.example.com. 7200  IN HTTPS 1 . (
+    mandatory=oblivious-gateway oblivious-gateway=osvc.example.com )
 ~~~
 
 ## Use in DNS server SVCB records
 
 For the "dns" scheme, as defined in {{DNS-SVCB}}, the presence of
-the "oblivious" parameter means that the DNS server being
+the "oblivious-gateway" parameter means that the DNS server being
 described is an Oblivious DNS over HTTP (DoH) service. The default
 media type expected for use in Oblivious HTTP to DNS resolvers
 is "application/dns-message" {{!DOH=RFC8484}}.
@@ -140,7 +145,7 @@ In order for DNS servers to function as oblivious gateways, they need
 to be accessible via an oblivious relay. Encrypted DNS servers
 used with the discovery mechanisms described in this section can
 either be publicly accessible, or specific to a network. In general,
-only publicly accessible DNS servers will work as Oblivious DNS
+only publicly accessible DNS servers will work as oblivious DNS
 servers, unless there is a coordinated deployment with an oblivious
 proxy that is also hosted within a network.
 
@@ -155,7 +160,8 @@ as supporting oblivious resolution using the following record:
 
 ~~~
 _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
-     alpn=h2 dohpath=/dns-query{?dns} oblivious )
+     alpn=h2 dohpath=/dns-query{?dns}
+     oblivious-gateway=odoh.example.net  )
 ~~~
 
 Clients still need to perform some verification of oblivious DNS servers,
@@ -183,7 +189,7 @@ more discussion.
 # Configuration Well-Known URI {#well-known}
 
 Clients that know a service is available as an oblivious gateway, e.g.,
-either via discovery through the "oblivious" parameter in a SVCB or HTTPS
+either via discovery through the "oblivious-gateway" parameter in a SVCB or HTTPS
 record, or by configuration, need to know the key configuration before sending
 oblivious requests.
 
@@ -196,19 +202,20 @@ SVCB record.
 For example, the URI for the following record:
 
 ~~~
-svc.example.com. 7200  IN HTTPS 1 . alpn=h2,h2 oblivious
+svc.example.com. 7200  IN HTTPS 1 . (
+     alpn=h2 oblivious-gateway=osvc.example.com )
 ~~~
 
-would be "https://svc.example.com/.well-known/oblivious-configs".
+would be "https://osvc.example.com/.well-known/oblivious-configs".
 
 As another example, the URI for the following record:
 
 ~~~
 _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
-     alpn=h2 dohpath=/dns-query{?dns} oblivious )
+     alpn=h2 dohpath=/dns-query{?dns} oblivious-gateway=odoh.example.net )
 ~~~
 
-would be "https://doh.example.net/.well-known/oblivious-configs".
+would be "https://odoh.example.net/.well-known/oblivious-configs".
 
 The content of this resource is expected to be "application/ohttp-keys",
 as defined in {{OHTTP}}.
@@ -261,7 +268,7 @@ registry ({{SVCB}}).
 
 | Number  | Name           | Meaning                            | Reference       |
 | ------- | -------------- | ---------------------------------- | --------------- |
-| TBD     | oblivious      | Describes if a service operates an oblivious HTTP gateway  | (This document) |
+| TBD     | oblivious-gateway | Defines an oblivious HTTP gateway to use to access this resource  | (This document) |
 
 ## Well-Known URI
 
