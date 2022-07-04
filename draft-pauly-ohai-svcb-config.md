@@ -36,7 +36,7 @@ informative:
 
 This document defines a parameter that can be included in SVCB and HTTPS
 DNS resource records to denote that a service is accessible as an Oblivious
-HTTP target, as well as a mechanism to look up oblivious key configurations
+Gateway Resource, as well as a mechanism to look up oblivious key configurations
 using a well-known URI.
 
 --- middle
@@ -44,33 +44,33 @@ using a well-known URI.
 # Introduction
 
 Oblivious HTTP {{!OHTTP=I-D.draft-ietf-ohai-ohttp}} allows clients to encrypt
-messages exchanged with an HTTP server accessed via a proxy, in such a way
-that the proxy cannot inspect the contents of the message and the target HTTP
-server does not discover the client's identity. In order to use Oblivious
-HTTP, clients need to possess a key configuration to use to encrypt messages
-to the oblivious target.
+messages exchanged with an HTTP target server accessed via an Oblivious Relay
+Resource (relay) and an Oblivious Gateway Resource (gateway), in such a way
+that the relay cannot inspect the contents of the message and the gateway
+does not discover the client's identity. In order to use Oblivious HTTP, clients
+need to possess a key configuration to use to encrypt messages to the gateway.
 
 Since Oblivious HTTP deployments will often involve very specific coordination
-between clients, proxies, and targets, the key configuration can often be
+between clients, relays, and gateways, the key configuration can often be
 shared in a bespoke fashion. However, some deployments involve clients
-discovering oblivious targets more dynamically. For example, a network may
+discovering oblivious gateways more dynamically. For example, a network may
 want to advertise a DNS resolver that is accessible over Oblivious HTTP
 and applies local network resolution policies via mechanisms like Discovery
 of Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}. Clients
-can work with trusted proxies to access these target servers.
+can work with trusted relays to access these gateways.
 
 This document defines a mechanism to advertise that an HTTP service supports
 Oblivious HTTP using DNS records, as a parameter that can be included in SVCB
 and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}}.
-The presence of this parameter indicates that a service has an oblivious
-target; see {{Section 3 of OHTTP}} for a description of oblivious targets.
+The presence of this parameter indicates that a service can act as an oblivious
+gateway; see {{Section 2 of OHTTP}} for a description of oblivious gateway.
 
 This document also defines a well-known URI {{!RFC8615}}, "oblivious-configs",
 that can be used to look up key configurations on a service that is known
-to have an oblivious target.
+act as an oblivious gateway.
 
-This mechanism does not aid in the discovery of proxies to use to access
-oblivious targets; the configuration of proxies is out of scope for this
+This mechanism does not aid in the discovery of relays to use to access
+oblivious gateways; the configuration of proxies is out of scope for this
 document.
 
 # Conventions and Definitions
@@ -80,10 +80,10 @@ document.
 # The oblivious SvcParamKey
 
 The "oblivious" SvcParamKey ({{iana}}) is used to indicate that a service
-described in an SVCB record can act as an oblivious target. Clients
-can issue requests to this service through an oblivious proxy once
+described in an SVCB record can act as an oblivious gateway resource. Clients
+can issue requests to this service through an oblivious relay once
 they learn the key configuration to use to encrypt messages to the
-oblivious target.
+oblivious gateway.
 
 Both the presentation and wire format values for the "oblivious"
 parameter MUST be empty.
@@ -93,7 +93,7 @@ list to ensure that clients that do not support oblivious access
 do not try to use the service. Services that mark oblivious
 support as mandatory can, therefore, indicate that the service might
 not be accessible in a non-oblivious fashion. Services that are
-intended to be accessed either as an oblivious target or directly
+intended to be accessed either with an oblivious gateway or directly
 SHOULD NOT mark the "oblivious" parameter as mandatory. Note that since
 multiple SVCB responses can be provided for a single query, the oblivious
 and non-oblivious versions of a single service can have different SVCB
@@ -114,7 +114,7 @@ being described is an Oblivious HTTP service that uses the default
 {{!BINARY-HTTP=I-D.draft-ietf-httpbis-binary-message}}.
 
 For example, an HTTPS service record for svc.example.com that supports
-an oblivious target could look like this:
+an oblivious gateway could look like this:
 
 ~~~
 svc.example.com. 7200  IN HTTPS 1 . alpn=h2,h2 oblivious
@@ -136,8 +136,8 @@ described is an Oblivious DNS over HTTP (DoH) service. The default
 media type expected for use in Oblivious HTTP to DNS resolvers
 is "application/dns-message" {{!DOH=RFC8484}}.
 
-In order for DNS servers to function as oblivious targets, they need
-to be accessible via an oblivious proxy. Encrypted DNS servers
+In order for DNS servers to function as oblivious gateways, they need
+to be accessible via an oblivious relay. Encrypted DNS servers
 used with the discovery mechanisms described in this section can
 either be publicly accessible, or specific to a network. In general,
 only publicly accessible DNS servers will work as Oblivious DNS
@@ -182,13 +182,13 @@ more discussion.
 
 # Configuration Well-Known URI {#well-known}
 
-Clients that know a service is available as an oblivious target, e.g.,
+Clients that know a service is available as an oblivious gateway, e.g.,
 either via discovery through the "oblivious" parameter in a SVCB or HTTPS
 record, or by configuration, need to know the key configuration before sending
 oblivious requests.
 
 This document defines a well-known URI {{!RFC8615}}, "oblivious-configs",
-that allows a target to host its configurations.
+that allows a gateway to host its configurations.
 
 The URI is constructed using the TargetName in the associated ServiceMode
 SVCB record.
@@ -213,7 +213,7 @@ would be "https://doh.example.net/.well-known/oblivious-configs".
 The content of this resource is expected to be "application/ohttp-keys",
 as defined in {{OHTTP}}.
 
-Before being able to use a server as an oblivious target, clients need
+Before being able to use a server as an oblivious gatweay, clients need
 to use this URI to fetch the configuration. They can either fetch it
 directly, or do so via a proxy in order to avoid the server discovering
 information about the client's identity. See {{security}} for more
@@ -225,12 +225,12 @@ Attackers on a network can remove SVCB information from cleartext DNS
 answers that are not protected by DNSSEC {{?DNSSEC=RFC4033}}. This
 can effectively downgrade clients. However, since SVCB indications
 for oblivious support are just hints, a client can mitigate this by
-always checking for oblivious target information. Use of encrypted DNS
+always checking for oblivious gateway information. Use of encrypted DNS
 or DNSSEC also can be used as mitigations.
 
 When discovering designated oblivious DNS servers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
-being able to directly check the contents of the target server's TLS
+being able to directly check the contents of the gateway server's TLS
 certificate. See {{ddr}} for more discussion, as well as the Security
 Considerations of {{?I-D.ietf-add-svcb-dns}}.
 
@@ -244,13 +244,13 @@ There are several approaches clients can use to mitigate key targeting
 attacks. {{?CONSISTENCY=I-D.draft-wood-key-consistency}} provides an analysis
 of the options for ensuring the key configurations are consistent between
 different clients. Clients SHOULD employ some technique to mitigate key
-targeting attack. Oblivious targets that are detected to use targeted
+targeting attack. Oblivious gateways that are detected to use targeted
 key configurations per-client MUST NOT be used.
 
-When clients fetch a target's configuration using the well-known URI,
+When clients fetch a gateway's configuration using the well-known URI,
 they can expose their identity in the form of an IP address if they do not
 connect via a proxy or some other IP-hiding mechanism. Clients SHOULD
-use a proxy or similar mechanism to avoid exposing client IPs to a target.
+use a proxy or similar mechanism to avoid exposing client IPs to a gateway.
 
 # IANA Considerations {#iana}
 
@@ -261,7 +261,7 @@ registry ({{SVCB}}).
 
 | Number  | Name           | Meaning                            | Reference       |
 | ------- | -------------- | ---------------------------------- | --------------- |
-| TBD     | oblivious      | Describes if a service has an oblivious target  | (This document) |
+| TBD     | oblivious      | Describes if a service operates an oblivious HTTP gateway  | (This document) |
 
 ## Well-Known URI
 
