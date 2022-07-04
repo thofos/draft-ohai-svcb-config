@@ -254,8 +254,10 @@ this might not be a privacy concern, since revealing that a particular
 client IP address is preparing to use an Oblivious HTTP service can be
 expected. However, if a client is otherwise trying to obfuscate its IP
 address or location (and not merely decouple its specific requests from its
-IP address), a proxy or similar mechanism can be used to fetch the gateway's
-configuration.
+IP address), or revealing its IP address will increase the risk of a key
+targeting attack (if a gateway service is trying to differentiate traffic
+across client IP addresses), a proxy or similar mechanism can be used to fetch
+the gateway's configuration.
 
 # IANA Considerations {#iana}
 
