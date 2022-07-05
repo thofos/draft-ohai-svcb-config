@@ -37,7 +37,7 @@ informative:
 This document defines a parameter that can be included in SVCB and HTTPS
 DNS resource records to denote that a service is accessible using Oblivious
 HTTP, with an indication of which Oblivious Gateway Resource to use to access
-the service (aa an Oblivious Target Resource). This document also defines
+the service (as an Oblivious Target Resource). This document also defines
 mechanisms to learn more details about the related Oblivious Gateway Resource,
 such as its key configuration.
 
@@ -70,7 +70,7 @@ The presence of this parameter indicates that a service can act as an oblivious
 target, and indicates an oblivious gateway that can provide access to the target.
 
 This document also defines two well-known URIs {{!RFC8615}}, which
-are access on the oblivious gateway indicated in the SVCB record.
+are accessed on the oblivious gateway indicated in the SVCB record.
 
 - "oblivious-configs", which can be used to look up key configurations
 on a host that has been identified as an oblivious gateway using SVCB
@@ -81,7 +81,7 @@ to a host that has been identified as an oblivious gateway using SVCB
 records ({{well-known-gateway}}).
 
 This mechanism does not aid in the discovery of oblivious relays;
-the configuration of relays is out of scope for this document.
+relay configuration is out of scope for this document.
 
 # Conventions and Definitions
 
@@ -273,7 +273,7 @@ svc.example.com. 7200  IN HTTPS 1 . (
 
 would be "https://osvc.example.com/.well-known/oblivious-gateway".
 
-Request to this resource are expected to use the content type
+Requests to this resource are expected to use the content type
 "message/ohttp-req", and responses are expected to use "message/ohttp-res",
 as defined in {{OHTTP}}.
 
