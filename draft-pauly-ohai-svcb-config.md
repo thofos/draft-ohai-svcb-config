@@ -242,7 +242,7 @@ answers that are not protected by DNSSEC {{?DNSSEC=RFC4033}}. This
 can effectively downgrade clients. However, since SVCB indications
 for oblivious support are just hints, a client can mitigate this by
 always checking for oblivious gateway information. Use of encrypted DNS
-or DNSSEC also can be used as mitigations.
+along with DNSSEC can be used as a mitigation.
 
 When discovering designated oblivious DNS servers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
