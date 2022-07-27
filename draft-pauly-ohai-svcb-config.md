@@ -64,7 +64,7 @@ can work with trusted relays to access these gateways.
 
 This document defines a mechanism to advertise that an HTTP service supports
 Oblivious HTTP using DNS records, as a parameter that can be included in SVCB
-and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}}.
+and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}} ({{svc-param}}).
 The presence of this parameter indicates that a service can act as an oblivious
 target and has an oblivious gateway that can provide access to the target.
 
@@ -76,13 +76,39 @@ This document also defines a way to fetch an oblivious gateway's key
 configuration from the oblivious gateway ({{config-fetch}}).
 
 This mechanism does not aid in the discovery of oblivious relays;
-relay configuration is out of scope for this document.
+relay configuration is out of scope for this document. Models in which
+this discovery mechanism is applicable are described in {{applicability}}.
 
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
 
-# The oblivious SvcParamKey
+# Applicability {#applicability}
+
+There are multiple models in which the discovery mechanism defined
+in this document can be used.
+
+- Upgrading non-oblivious HTTP to oblivious HTTP. In this model, the
+client intends to communicate with a specific target service, and
+prefers to use oblivious HTTP if it is available. The target service
+has an oblivious gateway that it offers to allow access using oblivious
+HTTP. Once the client learns about the oblivious gateway, it "upgrades"
+to using oblivious HTTP to access the target service.
+
+- Discovering alternative oblivious HTTP services. In this model,
+the client has a default oblivious target service that it uses. For
+example, this may be a public DNS resolver that is accessible over
+oblivious HTTP. The client is willing to use alternative oblivious
+target services if they are discovered, which may provide more
+optimized or more relevant responses.
+
+In both of these deployment models, the client is assumed to already
+know of an oblivious relay that it trusts and works with. This oblivious
+relay either needs to provide generic access to oblivious gateways, or
+provide a service to clients to allow them to check which gateways
+are accessible.
+
+# The oblivious SvcParamKey {#svc-param}
 
 The "oblivious" SvcParamKey ({{iana}}) is used to indicate that a
 service described in an SVCB record can be accessed as an oblivious target
