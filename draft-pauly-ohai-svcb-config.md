@@ -217,7 +217,7 @@ Clients also need to know the key configuration of an oblivious gateway before
 sending oblivious requests.
 
 In order to fetch the key configuration of an oblivious gateway discovered
-in the manner described in {{gateway-fetch}}, the client issues a GET request
+in the manner described in {{gateway-location}}, the client issues a GET request
 to the URI of the gateway specifying the "application/ohttp-keys" ({{OHTTP}})
 media type in the Accept header.
 
