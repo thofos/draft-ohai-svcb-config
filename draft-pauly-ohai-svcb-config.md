@@ -59,7 +59,7 @@ shared in a bespoke fashion. However, some deployments involve clients
 discovering oblivious targets and their assoicated gateways more dynamically.
 For example, a network may want to advertise a DNS resolver that is accessible
 over Oblivious HTTP and applies local network resolution policies via mechanisms
-like Discovery of Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}. Clients
+like Discovery of Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients
 can work with trusted relays to access these gateways.
 
 This document defines a mechanism to advertise that an HTTP service supports
