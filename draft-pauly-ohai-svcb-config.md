@@ -305,16 +305,16 @@ registry ({{SVCB}}).
 
 ## Well-Known URI
 
- IANA is requested to add one new entry in the "Well-Known URIs" registry {{WELLKNOWN}}.
- 
- URI suffix: oblivious-gateway
+IANA is requested to add one new entry in the "Well-Known URIs" registry {{WELLKNOWN}}.
 
- Change controller: IETF
+URI suffix: oblivious-gateway
 
- Specification document: This document
+Change controller: IETF
 
- Status: permanent
+Specification document: This document
 
- Related information: N/A
+Status: permanent
+
+Related information: N/A
 
 --- back
