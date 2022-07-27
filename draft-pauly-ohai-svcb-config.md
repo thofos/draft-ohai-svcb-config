@@ -68,12 +68,12 @@ and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}}.
 The presence of this parameter indicates that a service can act as an oblivious
 target and has an oblivious gateway that can provide access to the target.
 
-This document also defines a way to fetch an oblivious gateway's location and
-key configuration from the oblivious target ({{config-fetch}}).
+The client learns the URI to use for the oblivious gateway using a well-known
+URI {{!WELLKNOWN=RFC8615}}, "oblivious-gateway", which is accessed on the
+oblivious target ({{gateway-location}}).
 
-This document also defines a well-known URI {{!RFC8615}}, "oblivious-gateway",
-that can be used to look up a gateway URI and the gateway's key configuration,
-based on the oblivious target.
+This document also defines a way to fetch an oblivious gateway's key
+configuration from the oblivious gateway ({{config-fetch}}).
 
 This mechanism does not aid in the discovery of oblivious relays;
 relay configuration is out of scope for this document.
@@ -172,9 +172,9 @@ check can be done when looking up the configuration on the gateway
 as described in {{config-fetch}}, which can either be done directly,
 or via the relay or another proxy to avoid exposing client IP addresses.
 
-Clients also need to ensure that they are not being targeted with unique
-key configurations that would reveal their identity. See {{security}} for
-more discussion.
+For the case of DoH servers, clients also need to ensure that they are not
+being targeted with unique DoH paths that would reveal their identity. See
+{{security}} for more discussion.
 
 ### Use with DNR {#dnr}
 
@@ -184,26 +184,58 @@ case, the oblivious configuration and path parameters can be included
 in DHCP and Router Advertisement messages.
 
 While DNR does not require the same kind of verification as DDR, clients
-still need to ensure that they are not being targeted with unique
-key configurations that would reveal their identity. See {{security}} for
-more discussion.
+that learn about DoH servers still need to ensure that they are not being
+targeted with unique DoH paths that would reveal their identity. See {{security}}
+for more discussion.
 
-# Key Configuration Fetching {#config-fetch}
+# Gateway Location {#gateway-location}
 
 Clients that know a service is available as an oblivious target
 via discovery through the "oblivious" parameter in a SVCB or HTTPS
-record need to know the location and key configuration of the associated
-oblivious gateway before sending oblivious requests.
+record need to know the location of the associated oblivious gateway
+before sending oblivious requests.
 
-In order to fetch the gateway URI and gateway key configuration, the client
-issues a GET request to the "/.well-known/oblivious-gateway" on the
-target service.
+By default, the oblivious gateway for an oblivious target is defined
+as a well-known resource ({{WELLKNOWN}}) on the target,
+"/.well-known/oblivious-gateway".
 
-For example, if the client is trying to access the target "svc.example.com",
-it should issue a request to
-"https://svc.example.com/.well-known/oblivious-gateway".
+Commonly, servers will not want to actually operate the oblivious gateway
+on a well-known URI. In such cases, servers can use 3xx redirection responses
+({{Section 15.4 of !HTTP=RFC9110}}) to direct clients and relays to the correct
+location of the oblivious gateway.
 
-// TODO: JSON
+Generally, the first request a client will make will be a GET request to
+discover the key configuration, described in {{config-fetch}}.
+This initial request also provides a convenient way for clients to learn
+about the redirect from the well-known resource, if there is a redirect.
+When clients work with their oblivious relays to send oblivious requests
+to the gateway, clients can communicate this redirected gateway URI.
+
+# Key Configuration Fetching {#config-fetch}
+
+Clients also need to know the key configuration of an oblivious gateway before
+sending oblivious requests.
+
+In order to fetch the key configuration of an oblivious gateway discovered
+in the manner described in {{gateway-fetch}}, the client issues a GET request
+to the URI of the gateway specifying the "application/ohttp-keys" ({{OHTTP}})
+media type in the Accept header.
+
+For example, if the client knows an oblivious gateway URI,
+"https://osvc.example.com/gateway", it could fetch the key configuration
+with the following request:
+
+~~~
+GET /gateway HTTP/1.1
+Host: osvc.example.com
+Accept: application/ohttp-keys
+~~~
+
+Oblivious gateways that coordinate with targets that advertise oblivious
+support SHOULD support GET requests for their key configuration in this
+manner, unless there is another out-of-band configuration model that is
+usable by clients. Gateways respond with their key configuration in the
+response body, with a content type of "application/ohttp-keys".
 
 Clients can either fetch this key configuration directly, or do so via
 a proxy in order to avoid the server discovering information about the
@@ -216,14 +248,24 @@ Attackers on a network can remove SVCB information from cleartext DNS
 answers that are not protected by DNSSEC {{?DNSSEC=RFC4033}}. This
 can effectively downgrade clients. However, since SVCB indications
 for oblivious support are just hints, a client can mitigate this by
-always checking for oblivious gateway information. Use of encrypted DNS
-along with DNSSEC can be used as a mitigation.
+always checking for oblivious gateway configuration {{config-fetch}}
+on the well-known gateway location {{gateway-location}}.
+Use of encrypted DNS along with DNSSEC can also be used as a mitigation.
 
 When discovering designated oblivious DNS servers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
 being able to directly check the contents of the gateway server's TLS
 certificate. See {{ddr}} for more discussion, as well as the Security
-Considerations of {{?I-D.ietf-add-svcb-dns}}.
+Considerations of {{?SVCBDNS=I-D.ietf-add-svcb-dns}}.
+
+For oblivious DoH servers, an attacker could use unique DoH path values
+to target or identify specific clients. Clients can mitigate such
+attacks in several ways. Some options include: only allow common DoH
+paths (such as the de-facto default "/dns-query{?dns}"); performing
+consistency checks by fetching the information about the resolver
+over multiple resolution paths; or coordinating with a trusted
+oblivious relay to validate that DoH paths are common across clients
+using the same gateway.
 
 As discussed in {{OHTTP}}, client requests using Oblivious HTTP
 can only be linked by recognizing the key configuration. In order to
@@ -263,7 +305,7 @@ registry ({{SVCB}}).
 
 ## Well-Known URI
 
- IANA is requested to add one new entry in the "Well-Known URIs" registry {{!RFC8615}}.
+ IANA is requested to add one new entry in the "Well-Known URIs" registry {{WELLKNOWN}}.
  
  URI suffix: oblivious-gateway
 
