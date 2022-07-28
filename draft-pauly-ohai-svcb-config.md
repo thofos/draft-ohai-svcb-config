@@ -1,7 +1,7 @@
 ---
 title: "Discovery of Oblivious Services via Service Binding Records"
 abbrev: "Oblivious Services in SVCB"
-category: info
+category: std
 stream: IETF
 
 docname: draft-pauly-ohai-svcb-config-latest
