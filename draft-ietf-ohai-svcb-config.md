@@ -4,7 +4,7 @@ abbrev: "Oblivious Services in SVCB"
 category: std
 stream: IETF
 
-docname: draft-pauly-ohai-svcb-config-latest
+docname: draft-ietf-ohai-svcb-config-latest
 area: "Security"
 workgroup: "Oblivious HTTP Application Intermediation"
 keyword: Internet-Draft
