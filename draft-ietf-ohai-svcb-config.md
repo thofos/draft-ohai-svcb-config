@@ -13,7 +13,7 @@ venue:
   type: "Working Group"
   mail: "ohai@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/ohai/"
-  github: tfpauly/draft-ohai-svcb-config
+  github: ietf-wg-ohai/draft-ohai-svcb-config
 
 v: 3
 
