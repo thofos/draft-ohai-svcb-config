@@ -248,12 +248,12 @@ to the URI of the gateway specifying the "application/ohttp-keys" ({{OHTTP}})
 media type in the Accept header.
 
 For example, if the client knows an oblivious gateway URI,
-"https://osvc.example.com/gateway", it could fetch the key configuration
-with the following request:
+"https://svc.example.com/.well-known/oblivious-gateway", it could fetch the
+key configuration with the following request:
 
 ~~~
-GET /gateway HTTP/1.1
-Host: osvc.example.com
+GET /.well-known/oblivious-gateway HTTP/1.1
+Host: svc.example.com
 Accept: application/ohttp-keys
 ~~~
 
