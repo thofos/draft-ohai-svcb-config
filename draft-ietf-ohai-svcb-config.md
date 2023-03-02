@@ -155,7 +155,7 @@ an oblivious gateway could look like this:
 svc.example.com. 7200  IN HTTPS 1 . ( alpn=h2 ohttp )
 ~~~
 
-A similar record for a service that only support oblivious connectivity
+A similar record for a service that only supports oblivious connectivity
 could look like this:
 
 ~~~
@@ -166,16 +166,22 @@ svc.example.com. 7200  IN HTTPS 1 . ( mandatory=ohttp ohttp )
 
 For the "dns" scheme, as defined in {{DNS-SVCB}}, the presence of
 the "ohttp" parameter means that the DNS server being
-described is an Oblivious DNS over HTTP (DoH) service. The default
-media type expected for use in Oblivious HTTP to DNS resolvers
-is "application/dns-message" {{!DOH=RFC8484}}.
+described has a DNS over HTTP (DoH) {{!DOH=RFC8484}} service that can
+be accessed using Oblivious HTTP. Requests to the resolver are sent to
+the oblivious gateway using binary HTTP with the default "message/bhttp"
+media type {{BINARY-HTTP}}, containing inner requests that use the
+"application/dns-message" media type {{DOH}}.
 
-In order for DNS servers to function as oblivious targets, their
+If the "ohttp" parameter is included in an DNS server SVCB record,
+the "alpn" MUST include at least one HTTP value (such as "h2" or
+"h3").
+
+In order for DoH servers to function as oblivious targets, their
 associated gateways need to be accessible via an oblivious relay.
-Encrypted DNS servers used with the discovery mechanisms described
+DoH servers used with the discovery mechanisms described
 in this section can either be publicly accessible, or specific to a
-network. In general, only publicly accessible DNS servers will work
-as oblivious DNS servers, unless there is a coordinated deployment
+network. In general, only publicly accessible DoH servers will work
+as oblivious targets, unless there is a coordinated deployment
 with an oblivious relay that is also hosted within a network.
 
 ### Use with DDR {#ddr}
