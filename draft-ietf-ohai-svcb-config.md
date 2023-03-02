@@ -203,6 +203,10 @@ such as the TLS certificate check described in {{DDR}}. This certificate
 check can be done when looking up the configuration on the gateway
 as described in {{config-fetch}}, which can either be done directly,
 or via the relay or another proxy to avoid exposing client IP addresses.
+Since the oblivious gateway that is discovered dynamically uses a well-known
+URI on the same host as the target, as described in {{config-fetch}}, the
+certificate evaluation for the connection to well-known gateway URI also
+covers the name of the target DoH server.
 
 For the case of DoH servers, clients also need to ensure that they are not
 being targeted with unique DoH paths that would reveal their identity. See
