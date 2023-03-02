@@ -152,14 +152,14 @@ For example, an HTTPS service record for svc.example.com that supports
 an oblivious gateway could look like this:
 
 ~~~
-svc.example.com. 7200  IN HTTPS 1 . ( alpn=h2 oblivious )
+svc.example.com. 7200  IN HTTPS 1 . ( alpn=h2 ohttp )
 ~~~
 
 A similar record for a service that only support oblivious connectivity
 could look like this:
 
 ~~~
-svc.example.com. 7200  IN HTTPS 1 . ( mandatory=oblivious oblivious )
+svc.example.com. 7200  IN HTTPS 1 . ( mandatory=ohttp ohttp )
 ~~~
 
 ## Use in DNS server SVCB records
@@ -189,7 +189,7 @@ as supporting oblivious resolution using the following record:
 
 ~~~
 _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
-     alpn=h2 dohpath=/dns-query{?dns} oblivious )
+     alpn=h2 dohpath=/dns-query{?dns} ohttp )
 ~~~
 
 Clients still need to perform some verification of oblivious DNS servers,
@@ -327,7 +327,7 @@ registry ({{SVCB}}).
 
 | Number  | Name           | Meaning                            | Reference       |
 | ------- | -------------- | ---------------------------------- | --------------- |
-| TBD     | oblivious      | Denotes that a service operates an oblivious HTTP target  | (This document) |
+| TBD     | ohttp          | Denotes that a service operates an Oblivious HTTP target  | (This document) |
 
 ## Well-Known URI
 
