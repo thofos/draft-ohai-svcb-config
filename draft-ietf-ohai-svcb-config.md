@@ -57,20 +57,23 @@ Since Oblivious HTTP deployments will often involve very specific coordination
 between clients, relays, and gateways, the key configuration can often be
 shared in a bespoke fashion. However, some deployments involve clients
 discovering oblivious targets and their assoicated gateways more dynamically.
-For example, a network may want to advertise a DNS resolver that is accessible
-over Oblivious HTTP and applies local network resolution policies via mechanisms
-like Discovery of Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients
-can work with trusted relays to access these gateways.
+For example, a network might operate a DNS resolver that applies local network
+resolution policies and is accessible using Oblivious HTTP, and might want to
+advertise support for Oblivious HTTP via mechanisms like Discovery of Designated
+Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients can work with trusted relays
+to access these gateways.
 
-This document defines a mechanism to advertise that an HTTP service supports
-Oblivious HTTP using DNS records, as a parameter that can be included in SVCB
+This document defines a way to use DNS records to advertise that an HTTP service
+supports Oblivious HTTP. This indication is a parameter that can be included in SVCB
 and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}} ({{svc-param}}).
 The presence of this parameter indicates that a service can act as an oblivious
 target and has an oblivious gateway that can provide access to the target.
 
 The client learns the URI to use for the oblivious gateway using a well-known
 URI {{!WELLKNOWN=RFC8615}}, "ohttp-gateway", which is accessed on the
-oblivious target ({{gateway-location}}).
+oblivious target ({{gateway-location}}). This means that for deployments that
+support this kind of discovery, the gateway and target resources need to
+be located on the same host.
 
 This document also defines a way to fetch an oblivious gateway's key
 configuration from the oblivious gateway ({{config-fetch}}).
