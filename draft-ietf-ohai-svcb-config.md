@@ -57,11 +57,11 @@ Since Oblivious HTTP deployments will often involve very specific coordination
 between clients, relays, and gateways, the key configuration can often be
 shared in a bespoke fashion. However, some deployments involve clients
 discovering oblivious targets and their assoicated gateways more dynamically.
-For example, a network might operate a DNS resolver that applies local network
-resolution policies and is accessible using Oblivious HTTP, and might want to
-advertise support for Oblivious HTTP via mechanisms like Discovery of Designated
-Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients can work with trusted relays
-to access these gateways.
+For example, a network might operate a DNS resolver that provides more optimized
+or more relevant DNS answers and is accessible using Oblivious HTTP, and might
+want to advertise support for Oblivious HTTP via mechanisms like Discovery of
+Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients can work with trusted
+relays to access these gateways.
 
 This document defines a way to use DNS records to advertise that an HTTP service
 supports Oblivious HTTP. This indication is a parameter that can be included in SVCB
