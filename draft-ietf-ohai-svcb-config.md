@@ -128,7 +128,7 @@ MUST be empty.
 
 The "ohttp" parameter can be included in the mandatory parameter
 list to ensure that clients that do not support oblivious access
-do not try to use the service. Services that mark the oblivious
+do not try to use the service. Services that mark the "ohttp"
 parameter as mandatory can, therefore, indicate that the service might
 not be accessible in a non-oblivious fashion. Services that are
 intended to be accessed either obliviously or directly
@@ -189,7 +189,7 @@ with an oblivious relay that is also hosted within a network.
 
 ### Use with DDR {#ddr}
 
-Clients can discover an oblivious DNS server configuration using
+Clients can discover an oblivious DoH server configuration using
 DDR, by either querying _dns.resolver.arpa to a locally configured
 resolver or querying using the name of a resolver {{DDR}}.
 
@@ -201,7 +201,7 @@ _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
      alpn=h2 dohpath=/dns-query{?dns} ohttp )
 ~~~
 
-Clients still need to perform some verification of oblivious DNS servers,
+Clients still need to perform some verification of oblivious DoH servers,
 such as the TLS certificate check described in {{DDR}}. This certificate
 check can be done when looking up the configuration on the gateway
 as described in {{config-fetch}}, which can either be done directly,
@@ -291,7 +291,7 @@ always checking for oblivious gateway configuration {{config-fetch}}
 on the well-known gateway location {{gateway-location}}.
 Use of encrypted DNS along with DNSSEC can also be used as a mitigation.
 
-When discovering designated oblivious DNS servers using this mechanism,
+When discovering designated oblivious DoH servers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
 being able to directly check the contents of the gateway server's TLS
 certificate. See {{ddr}} for more discussion, as well as the Security
