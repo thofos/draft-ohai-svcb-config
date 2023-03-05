@@ -189,9 +189,9 @@ with an oblivious relay that is also hosted within a network.
 
 ### Use with DDR {#ddr}
 
-Clients can discover an oblivious DoH server configuration using
-DDR, by either querying _dns.resolver.arpa to a locally configured
-resolver or querying using the name of a resolver {{DDR}}.
+Clients can discover that a DoH server support Oblivious HTTP using
+DDR, either by querying _dns.resolver.arpa to a locally configured
+resolver or by querying using the name of a resolver {{DDR}}.
 
 For example, a DoH service advertised over DDR can be annotated
 as supporting oblivious resolution using the following record:
@@ -210,6 +210,15 @@ Since the oblivious gateway that is discovered dynamically uses a well-known
 URI on the same host as the target, as described in {{config-fetch}}, the
 certificate evaluation for the connection to well-known gateway URI also
 covers the name of the target DoH server.
+
+Opportunistic discovery {{DDR}}, where only the IP address is validated,
+SHOULD NOT be used in general with oblivious HTTP, since this mode
+primarily exists to support resolvers that use private or local IP
+addresses, which will usually not be accessible when using an oblivious
+relay. If a configuration occurs where the resolver is accessible, but
+cannot use certificate-based validation, the client needs to ensure
+that the oblivious relay only accesses the gateway and target using
+the unencrypted resolver's original IP address.
 
 For the case of DoH servers, clients also need to ensure that they are not
 being targeted with unique DoH paths that would reveal their identity. See
