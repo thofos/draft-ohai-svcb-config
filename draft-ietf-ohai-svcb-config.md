@@ -322,7 +322,7 @@ configuration discovery mechanism need to be concerned with attacks
 that target a specific user or population with a unique key configuration.
 
 There are several approaches clients can use to mitigate key targeting
-attacks. {{?CONSISTENCY=I-D.draft-wood-key-consistency}} provides an analysis
+attacks. {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}} provides an analysis
 of the options for ensuring the key configurations are consistent between
 different clients. Clients SHOULD employ some technique to mitigate key
 targeting attack. Oblivious gateways that are detected to use targeted
