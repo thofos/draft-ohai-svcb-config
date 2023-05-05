@@ -300,34 +300,6 @@ always checking for oblivious gateway configuration {{config-fetch}}
 on the well-known gateway location {{gateway-location}}.
 Use of encrypted DNS along with DNSSEC can also be used as a mitigation.
 
-When discovering designated oblivious DoH servers using this mechanism,
-clients need to ensure that the designation is trusted in lieu of
-being able to directly check the contents of the gateway server's TLS
-certificate. See {{ddr}} for more discussion, as well as the Security
-Considerations of {{?SVCBDNS=I-D.ietf-add-svcb-dns}}.
-
-For oblivious DoH servers, an attacker could use unique DoH path values
-to target or identify specific clients. Clients can mitigate such
-attacks in several ways. Some options include: only allow common DoH
-paths (such as the de-facto default "/dns-query{?dns}"); performing
-consistency checks by fetching the information about the resolver
-over multiple resolution paths; or coordinating with a trusted
-oblivious relay to validate that DoH paths are common across clients
-using the same gateway.
-
-As discussed in {{OHTTP}}, client requests using Oblivious HTTP
-can only be linked by recognizing the key configuration. In order to
-prevent unwanted linkability and tracking, clients using any key
-configuration discovery mechanism need to be concerned with attacks
-that target a specific user or population with a unique key configuration.
-
-There are several approaches clients can use to mitigate key targeting
-attacks. {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}} provides an analysis
-of the options for ensuring the key configurations are consistent between
-different clients. Clients SHOULD employ some technique to mitigate key
-targeting attack. Oblivious gateways that are detected to use targeted
-key configurations per-client MUST NOT be used.
-
 When clients fetch a gateway's configuration ({{config-fetch}}),
 they can expose their identity in the form of an IP address if they do not
 connect via a proxy or some other IP-hiding mechanism. In some circumstances,
@@ -339,6 +311,40 @@ IP address), or revealing its IP address will increase the risk of a key
 targeting attack (if a gateway service is trying to differentiate traffic
 across client IP addresses), a proxy or similar mechanism can be used to fetch
 the gateway's configuration.
+
+When discovering designated oblivious DoH servers using this mechanism,
+clients need to ensure that the designation is trusted in lieu of
+being able to directly check the contents of the gateway server's TLS
+certificate. See {{ddr}} for more discussion, as well as the Security
+Considerations of {{?SVCBDNS=I-D.ietf-add-svcb-dns}}.
+
+## Key Targeting Attacks
+
+As discussed in {{OHTTP}}, client requests using Oblivious HTTP
+can only be linked by recognizing the key configuration. In order to
+prevent unwanted linkability and tracking, clients using any key
+configuration discovery mechanism need to be concerned with attacks
+that target a specific user or population with a unique key configuration.
+
+There are several approaches clients can use to mitigate key targeting
+attacks. {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}} provides an analysis
+of the options for ensuring the key configurations are consistent between
+different clients. Clients SHOULD employ some technique to mitigate key
+targeting attacks, such as the option of confirming the key with a shared
+proxy as described in {{CONSISTENCY}}. Oblivious gateways that are detected
+to use targeted key configurations per-client MUST NOT be used.
+
+## dohpath Targeting Attacks
+
+For oblivious DoH servers, an attacker could use unique `dohpath` values
+to target or identify specific clients. This attack is very similar to
+the key targeting attack described above.
+
+Clients SHOULD mitigate such potential attacks. This can be done with
+check for consistency, such as using a mechanism described in {{CONSISTENCY}}
+to validate the `dohpath` value with another source. It can also be
+done by limiting the the allowable values of `dohpath` to a single
+value, such as the commonly used "/dns-query{?dns}".
 
 # IANA Considerations {#iana}
 
