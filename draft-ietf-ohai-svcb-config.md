@@ -307,7 +307,7 @@ this might not be a privacy concern, since revealing that a particular
 client IP address is preparing to use an Oblivious HTTP service can be
 expected. However, if a client is otherwise trying to hide its IP
 address or location (and not merely decouple its specific requests from its
-IP address), or if revealing its IP address facilitates key targeting attacks 
+IP address), or if revealing its IP address facilitates key targeting attacks
 (if a gateway service uses IP addresses to associate specific configurations
 with specific clients), a proxy or similar mechanism can be used to fetch
 the gateway's configuration.
