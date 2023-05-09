@@ -305,11 +305,11 @@ they can expose their identity in the form of an IP address if they do not
 connect via a proxy or some other IP-hiding mechanism. In some circumstances,
 this might not be a privacy concern, since revealing that a particular
 client IP address is preparing to use an Oblivious HTTP service can be
-expected. However, if a client is otherwise trying to obfuscate its IP
+expected. However, if a client is otherwise trying to hide its IP
 address or location (and not merely decouple its specific requests from its
-IP address), or revealing its IP address will increase the risk of a key
-targeting attack (if a gateway service is trying to differentiate traffic
-across client IP addresses), a proxy or similar mechanism can be used to fetch
+IP address), or if revealing its IP address facilitates key targeting attacks 
+(if a gateway service uses IP addresses to associate specific configurations
+with specific clients), a proxy or similar mechanism can be used to fetch
 the gateway's configuration.
 
 When discovering designated oblivious DoH servers using this mechanism,
@@ -338,9 +338,9 @@ to use targeted key configurations per-client MUST NOT be used.
 
 For oblivious DoH servers, an attacker could use unique `dohpath` values
 to target or identify specific clients. This attack is very similar to
-the key targeting attack described above.
+the generic OHTTP key targeting attack described above.
 
-Clients SHOULD mitigate such potential attacks. This can be done with
+Clients SHOULD mitigate such attacks. This can be done with a
 check for consistency, such as using a mechanism described in {{CONSISTENCY}}
 to validate the `dohpath` value with another source. It can also be
 done by limiting the the allowable values of `dohpath` to a single
