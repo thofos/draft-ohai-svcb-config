@@ -56,7 +56,7 @@ the gateway and target cannot discover the client's identity.
 Since Oblivious HTTP deployments will often involve very specific coordination
 between clients, relays, and gateways, the key configuration can often be
 shared in a bespoke fashion. However, some deployments involve clients
-discovering oblivious targets and their assoicated gateways more dynamically.
+discovering oblivious targets and their associated gateways more dynamically.
 For example, a network might operate a DNS resolver that provides more optimized
 or more relevant DNS answers and is accessible using Oblivious HTTP, and might
 want to advertise support for Oblivious HTTP via mechanisms like Discovery of
@@ -149,7 +149,7 @@ For the "https" scheme, which uses the HTTPS RR type instead of SVCB,
 the presence of the "ohttp" parameter means that the target
 being described is an Oblivious HTTP service that is accessible using
 the default "message/bhttp" media type {{OHTTP}}
-{{!BINARY-HTTP=I-D.draft-ietf-httpbis-binary-message}}.
+{{!BINARY-HTTP=RFC9292}}.
 
 For example, an HTTPS service record for svc.example.com that supports
 an oblivious gateway could look like this:
@@ -316,7 +316,7 @@ When discovering designated oblivious DoH servers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
 being able to directly check the contents of the gateway server's TLS
 certificate. See {{ddr}} for more discussion, as well as the Security
-Considerations of {{?SVCBDNS=I-D.ietf-add-svcb-dns}}.
+Considerations of {{DNS-SVCB}}.
 
 ## Key Targeting Attacks
 
