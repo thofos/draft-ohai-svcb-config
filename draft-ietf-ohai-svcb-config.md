@@ -255,7 +255,7 @@ made to fetch key configurations (as defined in {{config-fetch}}) and to
 oblivious requests made via an oblivious relay.
 
 If a client receives a redirect when fetching the key configuration from the
-well-known gateway resource, it MUST NOT communicate the the redirected
+well-known gateway resource, it MUST NOT communicate the redirected
 gateway URI to the oblivious relay as the location of the gateway to use.
 Doing so would allow the oblivious gateway to target clients by encoding
 unique or client-identifying values in the redirected URI. Instead,
