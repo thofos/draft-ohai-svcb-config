@@ -250,14 +250,19 @@ as a well-known resource ({{WELLKNOWN}}) on the target,
 Commonly, servers will not want to actually operate the oblivious gateway
 on a well-known URI. In such cases, servers can use 3xx redirection responses
 ({{Section 15.4 of !HTTP=RFC9110}}) to direct clients and relays to the correct
-location of the oblivious gateway.
+location of the oblivious gateway. Such redirects would apply both to requests
+made to fetch key configurations (as defined in {{config-fetch}}) and to
+oblivious requests made via an oblivious relay.
 
-Generally, the first request a client will make will be a GET request to
-discover the key configuration, described in {{config-fetch}}.
-This initial request also provides a convenient way for clients to learn
-about the redirect from the well-known resource, if there is a redirect.
-When clients work with their oblivious relays to send oblivious requests
-to the gateway, clients can communicate this redirected gateway URI.
+If a client receives a redirect when fetching the key configuration from the
+well-known gateway resource, it MUST NOT communicate the the redirected
+gateway URI to the oblivious relay as the location of the gateway to use.
+Doing so would allow the oblivious gateway to target clients by encoding
+unique or client-identifying values in the redirected URI. Instead,
+relays being used with dynamically discovered gateways MUST use the
+well-known gateway resource and follow any redirects independently of
+redirects that clients received. The relay can remember such redirects
+across oblivious requests for all clients in order to avoid added latency.
 
 # Key Configuration Fetching {#config-fetch}
 
