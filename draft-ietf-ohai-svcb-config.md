@@ -335,8 +335,10 @@ attacks. {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}} provides an overv
 of the options for ensuring the key configurations are consistent between
 different clients. Clients SHOULD employ some technique to mitigate key
 targeting attacks, such as the option of confirming the key with a shared
-proxy as described in {{CONSISTENCY}}. Gateways that are detected
-to use targeted key configurations per-client MUST NOT be used.
+proxy as described in {{CONSISTENCY}}. If a client detects that a gateway
+is using per-client targeted key configuration, the client can stop using
+the gateway, and potentially report the targeting attack to let other
+clients avoid using this gateway in the future.
 
 ## dohpath Targeting Attacks
 
