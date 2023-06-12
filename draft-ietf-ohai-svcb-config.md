@@ -246,7 +246,7 @@ before sending oblivious requests.
 By default, the gateway for a target is defined as a well-known
 resource ({{WELLKNOWN}}) on the target, "/.well-known/ohttp-gateway".
 
-Some servers may not want to operate the gateway on a well-known URI.
+Some servers might not want to operate the gateway on a well-known URI.
 In such cases, these servers can use 3xx redirection responses
 ({{Section 15.4 of !HTTP=RFC9110}}) to direct clients and relays to the correct
 location of the gateway. Such redirects would apply both to requests
