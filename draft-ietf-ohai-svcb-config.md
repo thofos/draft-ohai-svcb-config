@@ -47,38 +47,39 @@ of the discovered Oblivious Gateway Resource.
 Oblivious HTTP {{!OHTTP=I-D.draft-ietf-ohai-ohttp}} allows clients to encrypt
 messages exchanged with an Oblivious Target Resource (target). The messages
 are encapsulated in encrypted messages to an Oblivious Gateway Resource
-(gateway), which gates access to the target. The gateway is access via an
+(gateway), which gates access to the target. The gateway is accessed via an
 Oblivious Relay Resource (relay), which proxies the encapsulated messages
 to hide the identity of the client. Overall, this architecture is designed
 in such a way that the relay cannot inspect the contents of messages, and
-the gateway and target cannot discover the client's identity.
+the gateway and target cannot learn the client's identity from a single
+transaction.
 
-Since Oblivious HTTP deployments will often involve very specific coordination
-between clients, relays, and gateways, the key configuration can often be
-shared in a bespoke fashion. However, some deployments involve clients
-discovering oblivious targets and their associated gateways more dynamically.
+Since Oblivious HTTP deployments typically involve very specific coordination
+between clients, relays, and gateways, the key configuration is often shared
+in a bespoke fashion. However, some deployments involve clients
+discovering targets and their associated gateways more dynamically.
 For example, a network might operate a DNS resolver that provides more optimized
 or more relevant DNS answers and is accessible using Oblivious HTTP, and might
 want to advertise support for Oblivious HTTP via mechanisms like Discovery of
-Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients can work with trusted
-relays to access these gateways.
+Designated Resolvers ({{!DDR=I-D.draft-ietf-add-ddr}}). Clients can access these
+gateways through trusted relays.
 
 This document defines a way to use DNS records to advertise that an HTTP service
-supports Oblivious HTTP. This indication is a parameter that can be included in SVCB
+supports Oblivious HTTP. This advertisement is a parameter that can be included in SVCB
 and HTTPS DNS resource records {{!SVCB=I-D.draft-ietf-dnsop-svcb-https}} ({{svc-param}}).
-The presence of this parameter indicates that a service can act as an oblivious
-target and has an oblivious gateway that can provide access to the target.
+The presence of this parameter indicates that a service can act as a target and
+has a gateway that can provide access to the target.
 
-The client learns the URI to use for the oblivious gateway using a well-known
+The client learns the URI to use for the gateway using a well-known
 URI {{!WELLKNOWN=RFC8615}}, "ohttp-gateway", which is accessed on the
-oblivious target ({{gateway-location}}). This means that for deployments that
+target ({{gateway-location}}). This means that for deployments that
 support this kind of discovery, the gateway and target resources need to
 be located on the same host.
 
-This document also defines a way to fetch an oblivious gateway's key
-configuration from the oblivious gateway ({{config-fetch}}).
+This document also defines a way to fetch an gateway's key
+configuration from the gateway ({{config-fetch}}).
 
-This mechanism does not aid in the discovery of oblivious relays;
+This mechanism does not aid in the discovery of relays;
 relay configuration is out of scope for this document. Models in which
 this discovery mechanism is applicable are described in {{applicability}}.
 
@@ -91,34 +92,34 @@ this discovery mechanism is applicable are described in {{applicability}}.
 There are multiple models in which the discovery mechanism defined
 in this document can be used.
 
-- Upgrading non-oblivious HTTP to oblivious HTTP. In this model, the
-client intends to communicate with a specific target service, and
-prefers to use oblivious HTTP if it is available. The target service
-has an oblivious gateway that it offers to allow access using oblivious
-HTTP. Once the client learns about the oblivious gateway, it "upgrades"
-to using oblivious HTTP to access the target service.
+- Upgrading regular (non-proxied) HTTP to Oblivious HTTP. In this model,
+the client intends to communicate with a specific target service, and
+prefers to use Oblivious HTTP if it is available. The target service
+has a gateway that it offers to allow access using Oblivious
+HTTP. Once the client learns about the gateway, it "upgrades"
+to using Oblivious HTTP to access the target service.
 
-- Discovering alternative oblivious HTTP services. In this model,
-the client has a default oblivious target service that it uses. For
+- Discovering alternative Oblivious HTTP services. In this model,
+the client has a default target service that it uses. For
 example, this may be a public DNS resolver that is accessible over
-oblivious HTTP. The client is willing to use alternative oblivious
+Oblivious HTTP. The client is willing to use alternative
 target services if they are discovered, which may provide more
 optimized or more relevant responses.
 
-In both of these deployment models, the client is assumed to already
-know of an oblivious relay that it trusts and works with. This oblivious
-relay either needs to provide generic access to oblivious gateways, or
+In both of these deployment models, the client is configured with
+a relay that it trusts for Oblivious HTTP transactions. This
+relay either needs to provide generic access to gateways, or
 provide a service to clients to allow them to check which gateways
 are accessible.
 
 # The ohttp SvcParamKey {#svc-param}
 
 The "ohttp" SvcParamKey ({{iana}}) is used to indicate that a
-service described in an SVCB record can be accessed as an oblivious target
+service described in an SVCB record can be accessed as a target
 using an associated gateway. The service that is queried by the client hosts
 one or more target resources.
 
-In order to access the service's target resources obliviously, the client
+In order to access the service's target resources using Oblivious HTTP, the client
 needs to send encapsulated messages to the gateway resource and the gateway's
 key configuration (both of which can be retrieved using the method described in
 {{config-fetch}}).
@@ -127,15 +128,14 @@ Both the presentation and wire format values for the "ohttp" parameter
 MUST be empty.
 
 The "ohttp" parameter can be included in the mandatory parameter
-list to ensure that clients that do not support oblivious access
+list to ensure that clients that do not support access via Oblivious HTTP
 do not try to use the service. Services that mark the "ohttp"
 parameter as mandatory can, therefore, indicate that the service might
-not be accessible in a non-oblivious fashion. Services that are
-intended to be accessed either obliviously or directly
-SHOULD NOT mark the "ohttp" parameter as mandatory. Note that since
-multiple SVCB responses can be provided for a single query, the oblivious
-and non-oblivious versions of a single service can have different SVCB
-records to support different names or properties.
+not be accessible except through Oblivious HTTP. Services that optionally
+support access using Oblivious HTTP SHOULD NOT mark the "ohttp" parameter
+as mandatory. Note that since multiple SVCB responses can be provided for
+a single query, the oblivious and non-oblivious versions of a single
+service can have different SVCB records to support different names or properties.
 
 The media type to use for encapsulated requests made to a target service
 depends on the scheme of the SVCB record. This document defines the
@@ -152,13 +152,13 @@ the default "message/bhttp" media type {{OHTTP}}
 {{!BINARY-HTTP=RFC9292}}.
 
 For example, an HTTPS service record for svc.example.com that supports
-an oblivious gateway could look like this:
+a Oblivious HTTP could look like this:
 
 ~~~
 svc.example.com. 7200  IN HTTPS 1 . ( alpn=h2 ohttp )
 ~~~
 
-A similar record for a service that only supports oblivious connectivity
+A similar record for a service that only supports Oblivious HTTP
 could look like this:
 
 ~~~
@@ -171,7 +171,7 @@ For the "dns" scheme, as defined in {{DNS-SVCB}}, the presence of
 the "ohttp" parameter means that the DNS server being
 described has a DNS over HTTP (DoH) {{!DOH=RFC8484}} service that can
 be accessed using Oblivious HTTP. Requests to the resolver are sent to
-the oblivious gateway using binary HTTP with the default "message/bhttp"
+the gateway using binary HTTP with the default "message/bhttp"
 media type {{BINARY-HTTP}}, containing inner requests that use the
 "application/dns-message" media type {{DOH}}.
 
@@ -179,22 +179,22 @@ If the "ohttp" parameter is included in an DNS server SVCB record,
 the "alpn" MUST include at least one HTTP value (such as "h2" or
 "h3").
 
-In order for DoH servers to function as oblivious targets, their
-associated gateways need to be accessible via an oblivious relay.
-DoH servers used with the discovery mechanisms described
+In order for DoH-capable recursive resolvers to function as Oblivious HTTP targets, their
+associated gateways need to be accessible via a client-trusted relay.
+DoH recursive resolvers used with the discovery mechanisms described
 in this section can either be publicly accessible, or specific to a
-network. In general, only publicly accessible DoH servers will work
-as oblivious targets, unless there is a coordinated deployment
-with an oblivious relay that is also hosted within a network.
+network. In general, only publicly accessible DoH recursive resolvers will work
+as Oblivious HTTP targets, unless there is a coordinated deployment
+with a relay to access the network-specific DoH recursive resolvers.
 
 ### Use with DDR {#ddr}
 
-Clients can discover that a DoH server support Oblivious HTTP using
+Clients can discover that a DoH recursive resolvers support Oblivious HTTP using
 DDR, either by querying _dns.resolver.arpa to a locally configured
 resolver or by querying using the name of a resolver {{DDR}}.
 
 For example, a DoH service advertised over DDR can be annotated
-as supporting oblivious resolution using the following record:
+as supporting resolution via Oblivious HTTP using the following record:
 
 ~~~
 _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
@@ -212,15 +212,15 @@ certificate evaluation for the connection to well-known gateway URI also
 covers the name of the target DoH server.
 
 Opportunistic discovery {{DDR}}, where only the IP address is validated,
-SHOULD NOT be used in general with oblivious HTTP, since this mode
+SHOULD NOT be used in general with Oblivious HTTP, since this mode
 primarily exists to support resolvers that use private or local IP
-addresses, which will usually not be accessible when using an oblivious
+addresses, which will usually not be accessible when using a
 relay. If a configuration occurs where the resolver is accessible, but
 cannot use certificate-based validation, the client needs to ensure
-that the oblivious relay only accesses the gateway and target using
+that the relay only accesses the gateway and target using
 the unencrypted resolver's original IP address.
 
-For the case of DoH servers, clients also need to ensure that they are not
+For the case of DoH recursive resolvers, clients also need to ensure that they are not
 being targeted with unique DoH paths that would reveal their identity. See
 {{security}} for more discussion.
 
@@ -232,32 +232,31 @@ case, the oblivious configuration and path parameters can be included
 in DHCP and Router Advertisement messages.
 
 While DNR does not require the same kind of verification as DDR, clients
-that learn about DoH servers still need to ensure that they are not being
+that learn about DoH recursive resolvers still need to ensure that they are not being
 targeted with unique DoH paths that would reveal their identity. See {{security}}
 for more discussion.
 
 # Gateway Location {#gateway-location}
 
-Clients that know a service is available as an oblivious target
+Clients that know a service is available as a target
 via discovery through the "ohttp" parameter in a SVCB or HTTPS
-record need to know the location of the associated oblivious gateway
+record need to know the location of the associated gateway
 before sending oblivious requests.
 
-By default, the oblivious gateway for an oblivious target is defined
-as a well-known resource ({{WELLKNOWN}}) on the target,
-"/.well-known/ohttp-gateway".
+By default, the gateway for a target is defined as a well-known
+resource ({{WELLKNOWN}}) on the target, "/.well-known/ohttp-gateway".
 
-Commonly, servers will not want to actually operate the oblivious gateway
-on a well-known URI. In such cases, servers can use 3xx redirection responses
+Some servers might not want to operate the gateway on a well-known URI.
+In such cases, these servers can use 3xx redirection responses
 ({{Section 15.4 of !HTTP=RFC9110}}) to direct clients and relays to the correct
-location of the oblivious gateway. Such redirects would apply both to requests
+location of the gateway. Such redirects would apply both to requests
 made to fetch key configurations (as defined in {{config-fetch}}) and to
-oblivious requests made via an oblivious relay.
+encapsulated requests made via a relay.
 
 If a client receives a redirect when fetching the key configuration from the
 well-known gateway resource, it MUST NOT communicate the redirected
-gateway URI to the oblivious relay as the location of the gateway to use.
-Doing so would allow the oblivious gateway to target clients by encoding
+gateway URI to the relay as the location of the gateway to use.
+Doing so would allow the gateway to target clients by encoding
 unique or client-identifying values in the redirected URI. Instead,
 relays being used with dynamically discovered gateways MUST use the
 well-known gateway resource and follow any redirects independently of
@@ -266,10 +265,10 @@ across oblivious requests for all clients in order to avoid added latency.
 
 # Key Configuration Fetching {#config-fetch}
 
-Clients also need to know the key configuration of an oblivious gateway before
-sending oblivious requests.
+Clients also need to know the key configuration of a gateway before encapsulating
+and sending requests to the relay.
 
-In order to fetch the key configuration of an oblivious gateway discovered
+In order to fetch the key configuration of a gateway discovered
 in the manner described in {{gateway-location}}, the client issues a GET request
 to the URI of the gateway specifying the "application/ohttp-keys" ({{OHTTP}})
 media type in the Accept header.
@@ -284,7 +283,7 @@ Host: svc.example.com
 Accept: application/ohttp-keys
 ~~~
 
-Oblivious gateways that coordinate with targets that advertise oblivious
+Gateways that coordinate with targets that advertise Oblivious HTTP
 support SHOULD support GET requests for their key configuration in this
 manner, unless there is another out-of-band configuration model that is
 usable by clients. Gateways respond with their key configuration in the
@@ -292,7 +291,7 @@ response body, with a content type of "application/ohttp-keys".
 
 Clients can either fetch this key configuration directly, or do so via
 a proxy in order to avoid the server discovering information about the
-client's identity. See {{security}} for more discussion of avoiding key
+client's identity. See {{consistency}} for more discussion of avoiding key
 targeting attacks.
 
 # Security and Privacy Considerations {#security}
@@ -300,8 +299,8 @@ targeting attacks.
 Attackers on a network can remove SVCB information from cleartext DNS
 answers that are not protected by DNSSEC {{?DNSSEC=RFC4033}}. This
 can effectively downgrade clients. However, since SVCB indications
-for oblivious support are just hints, a client can mitigate this by
-always checking for oblivious gateway configuration {{config-fetch}}
+for Oblivious HTTP support are just hints, a client can mitigate this by
+always checking for a gateway configuration {{config-fetch}}
 on the well-known gateway location {{gateway-location}}.
 Use of encrypted DNS along with DNSSEC can also be used as a mitigation.
 
@@ -317,13 +316,13 @@ IP address), or if revealing its IP address facilitates key targeting attacks
 with specific clients), a proxy or similar mechanism can be used to fetch
 the gateway's configuration.
 
-When discovering designated oblivious DoH servers using this mechanism,
+When discovering designated oblivious DoH recursive resolvers using this mechanism,
 clients need to ensure that the designation is trusted in lieu of
 being able to directly check the contents of the gateway server's TLS
 certificate. See {{ddr}} for more discussion, as well as the Security
 Considerations of {{DNS-SVCB}}.
 
-## Key Targeting Attacks
+## Key Targeting Attacks {#consistency}
 
 As discussed in {{OHTTP}}, client requests using Oblivious HTTP
 can only be linked by recognizing the key configuration. In order to
@@ -332,11 +331,11 @@ configuration discovery mechanism need to be concerned with attacks
 that target a specific user or population with a unique key configuration.
 
 There are several approaches clients can use to mitigate key targeting
-attacks. {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}} provides an analysis
+attacks. {{?CONSISTENCY=I-D.ietf-privacypass-key-consistency}} provides an overview
 of the options for ensuring the key configurations are consistent between
 different clients. Clients SHOULD employ some technique to mitigate key
 targeting attacks, such as the option of confirming the key with a shared
-proxy as described in {{CONSISTENCY}}. Oblivious gateways that are detected
+proxy as described in {{CONSISTENCY}}. Gateways that are detected
 to use targeted key configurations per-client MUST NOT be used.
 
 ## dohpath Targeting Attacks
