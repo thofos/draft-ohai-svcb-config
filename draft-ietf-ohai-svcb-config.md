@@ -201,15 +201,14 @@ _dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
      alpn=h2 dohpath=/dns-query{?dns} ohttp )
 ~~~
 
-Clients still need to perform some verification of oblivious DoH servers,
-such as the TLS certificate check described in {{DDR}}. This certificate
-check can be done when looking up the configuration on the gateway
-as described in {{config-fetch}}, which can either be done directly,
+Clients still need to perform verification of oblivious DoH servers,
+specifically the TLS certificate checks described in {{Section 4.2 of DDR}}.
+Since the gateway and target resources for discovered oblivious services
+need to be on the same host, this means that the client needs to verify
+that the certificate presented by the gateway passes the required checks.
+These checks can be performed when looking up the configuration on the gateway
+as described in {{config-fetch}}, which can either be done directly
 or via the relay or another proxy to avoid exposing client IP addresses.
-Since the oblivious gateway that is discovered dynamically uses a well-known
-URI on the same host as the target, as described in {{config-fetch}}, the
-certificate evaluation for the connection to well-known gateway URI also
-covers the name of the target DoH server.
 
 Opportunistic discovery {{DDR}}, where only the IP address is validated,
 SHOULD NOT be used in general with Oblivious HTTP, since this mode
