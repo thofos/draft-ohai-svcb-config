@@ -237,10 +237,9 @@ for more discussion.
 
 # Gateway Location {#gateway-location}
 
-Clients that know a service is available as a target
-via discovery through the "ohttp" parameter in a SVCB or HTTPS
-record need to know the location of the associated gateway
-before sending oblivious requests.
+Once a client has discovered that a service supports Oblivious HTTP
+via the "ohttp" parameter in a SVCB or HTTPS record, it needs to be
+able to send requests via a relay to the correct gateway location.
 
 By default, the gateway for a target is defined as a well-known
 resource ({{WELLKNOWN}}) on the target, "/.well-known/ohttp-gateway".
