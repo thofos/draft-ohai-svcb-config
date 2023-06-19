@@ -1,0 +1,1993 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2022-11-10T01:05:48.016021+00:00",
+  "repo": "ietf-wg-ohai/draft-ohai-svcb-config",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    },
+    {
+      "name": "discuss",
+      "description": "",
+      "color": "E63756"
+    }
+  ],
+  "issues": [
+    {
+      "number": 2,
+      "id": "I_kwDOG3oZ-85EYSFG",
+      "title": "OHTTP targets need a path",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/2",
+      "state": "CLOSED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I may have missed it, but the current draft doesn't seem to provide a way for clients to discover the full oblivious target resource from a HTTPS record with the \"oblivious-configs\" parameter -- it only gives them the configuration structure. Similar to the DNS case, OHTTP targets are defined by their path, so I think it might make sense to mint a new parameter for the path, maybe \"oblivious-path\"? ",
+      "createdAt": "2022-02-22T18:04:11Z",
+      "updatedAt": "2022-02-28T22:00:48Z",
+      "closedAt": "2022-02-28T22:00:48Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, for the DNS case, they have dohpath, but I think we'd need a path here too for oblivious HTTP generically!",
+          "createdAt": "2022-02-22T18:05:06Z",
+          "updatedAt": "2022-02-22T18:05:06Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@tfpauly would you like a PR?",
+          "createdAt": "2022-02-23T00:54:59Z",
+          "updatedAt": "2022-02-23T00:54:59Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Nah, I can add it soon.",
+          "createdAt": "2022-02-23T00:55:34Z",
+          "updatedAt": "2022-02-23T00:55:34Z"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "I_kwDOG3oZ-85EYTef",
+      "title": "Mixed configuration structures for DNS",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/3",
+      "state": "CLOSED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft currently allows for the \"configs\" parameter to carry an `ObliviousDoHConfigs` structure instead of a `KeyConfig`. `ObliviousDoHConfigs` looks like so:\r\n\r\n~~~\r\nstruct {\r\n   uint16 kem_id;\r\n   uint16 kdf_id;\r\n   uint16 aead_id;\r\n   opaque public_key<1..2^16-1>;\r\n} ObliviousDoHConfigContents;\r\n\r\nstruct {\r\n   uint16 version;\r\n   uint16 length;\r\n   select (ObliviousDoHConfig.version) {\r\n      case 0x0001: ObliviousDoHConfigContents contents;\r\n   }\r\n} ObliviousDoHConfig;\r\n\r\nObliviousDoHConfig ObliviousDoHConfigs<1..2^16-1>;\r\n~~~\r\n\r\nAnd `KeyConfig`:\r\n\r\n~~~\r\nstruct {\r\n  uint8 key_id;\r\n  HpkeKemId kem_id;\r\n  HpkePublicKey public_key;\r\n  HpkeSymmetricAlgorithms cipher_suites<4..2^16-4>;\r\n} KeyConfig;\r\n~~~\r\n\r\nI've not actually worked it out, but I wonder if these structures are defined such that clients can always distinguish between the two. If clients get confused, they might try to engage the OHTTP encapsulation logic instead of ODoH logic (or vice versa), and I don't think we have a good understanding of what can happen as a result.\r\n\r\nAbsent this analysis, I would drop the ability for configs to carry either one of these structures, and unify around `KeyConfig`. ",
+      "createdAt": "2022-02-22T18:10:36Z",
+      "updatedAt": "2022-02-28T22:00:48Z",
+      "closedAt": "2022-02-28T22:00:48Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I don't think it's possible for a config to parse validly for both \u2014 we can add the analysis.",
+          "createdAt": "2022-02-22T20:12:04Z",
+          "updatedAt": "2022-02-22T20:12:04Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Having this ambiguous definition doesn't seem particularly helpful. Why not just pick the simpler thing here?",
+          "createdAt": "2022-02-22T20:13:40Z",
+          "updatedAt": "2022-02-22T20:13:40Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The simpler thing being defining two separate keys?",
+          "createdAt": "2022-02-22T20:15:16Z",
+          "updatedAt": "2022-02-22T20:15:16Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "There's probably at least three options:\r\n\r\n1. Use separate keys for each config type\r\n1. Use `KeyConfig` for OHTTP and `ObliviousDoHConfigs` for ODoH\r\n1. Use `KeyConfig` for OHTTP and ODoH\r\n\r\nI would go with option (3), but (1) and (2) seem reasonable?",
+          "createdAt": "2022-02-22T20:18:23Z",
+          "updatedAt": "2022-02-22T20:18:23Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think the choice is more like:\r\n1. Use one SVCB parameter for `KeyConfig`, which covers OHTTP generic and ODoH \"v2\", and another SVCB parameter for `ObliviousDoHConfigs` for ODoH \"v1\"\r\n2. Use the same SVCB parameter for both versions of ODoH, so that DNS resolver software doesn't have to care about the two",
+          "createdAt": "2022-02-22T20:25:19Z",
+          "updatedAt": "2022-02-22T20:25:19Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's a better framing, and between the two, I would go with (1). \ud83e\udd37 ",
+          "createdAt": "2022-02-22T21:05:50Z",
+          "updatedAt": "2022-02-22T21:05:50Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@tfpauly would you like a PR?",
+          "createdAt": "2022-02-23T00:54:50Z",
+          "updatedAt": "2022-02-23T00:54:50Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "No, I'll do a restructure.",
+          "createdAt": "2022-02-23T00:57:50Z",
+          "updatedAt": "2022-02-23T00:57:50Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOG3oZ-85EYT9Z",
+      "title": "Key consistency",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/4",
+      "state": "CLOSED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The security considerations section lists several ways in which clients could try to ensure they have a consistent view of the oblivious target's public key. Shamelessly, I would instead cite [this document](https://chris-wood.github.io/key-consistency/draft-wood-key-consistency.html), as that's what OHTTP is doing now. (We're going to SECDISPATCH this to see what becomes of it.)",
+      "createdAt": "2022-02-22T18:12:49Z",
+      "updatedAt": "2022-02-22T21:02:56Z",
+      "closedAt": "2022-02-22T21:02:56Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yes, that's a good citation to make",
+          "createdAt": "2022-02-22T20:12:22Z",
+          "updatedAt": "2022-02-22T20:12:22Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOG3oZ-85EYXWj",
+      "title": "ODoH target verification",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/5",
+      "state": "CLOSED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft seems to prohibit DDR verification for ODoH targets:\r\n\r\n> In the case of oblivious DNS servers, the client cannot direclty use the verification mechanisms described in {{DDR}}, which rely on checking for known resovler IP addresses or hostnames in TLS certificates, since clients do not directly perfom TLS with oblivious targets.\r\n\r\nIt's true that the normal flow of ODoH doesn't require the client to check with the oblivious target, but the client _could_ do this before sending queries to the target. Whether that is a privacy problem depends on the threat model, I think. For example, if there's only one client that discovers and validates this oblivious target, then applying the DDR check would basically break the ODoH guarantee that the target can't link queries to clients. But that's not necessarily true if there are many clients. \r\n\r\nI'd relax this text and allow either verification mechanism, noting the possible problem that might arise if there's not a sufficient number of clients using the target. ",
+      "createdAt": "2022-02-22T18:29:18Z",
+      "updatedAt": "2022-02-22T21:14:33Z",
+      "closedAt": "2022-02-22T21:14:33Z",
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOG3oZ-85FRk-H",
+      "title": "DNSSEC doesn't provide consistency",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/11",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "> One mitigation specific to this mechanism is validating that SVCB or HTTPS records including the \"oblivious-configs\" are protected by [DNSSEC](https://www.ietf.org/archive/id/draft-pauly-ohai-svcb-config-00.html#DNSSEC) [DNSSEC]. This prevents attacks where a unique response is generated for each client of a resolver.\r\n\r\n-- https://www.ietf.org/archive/id/draft-pauly-ohai-svcb-config-00.html#section-5-3\r\n\r\nThis isn't true as DNSSEC responses can be customized on a per-client basis (worse if EDNS(0) client subnet is in use).  What might be a more realistic protection here is caching at a resolver, which might prevent that sort of customization.  Of course, if this is for DNS resolution - as it is - that doesn't necessarily help that much.",
+      "createdAt": "2022-03-08T05:25:46Z",
+      "updatedAt": "2022-07-05T19:45:04Z",
+      "closedAt": "2022-07-05T19:45:04Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fair enough \u2014 we can remove this comment.",
+          "createdAt": "2022-03-08T05:31:44Z",
+          "updatedAt": "2022-03-08T05:31:44Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This was removed a while ago",
+          "createdAt": "2022-07-05T19:45:04Z",
+          "updatedAt": "2022-07-05T19:45:04Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOG3oZ-85FRlTs",
+      "title": "What does ohttp-path identify?",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/12",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Is it the oblivious request resource or the oblivious proxy resource.  Clients need the latter, but it doesn't seem like you have allowed for an absolute URI as this is a \"path\" and not a URI and [this](https://www.ietf.org/archive/id/draft-pauly-ohai-svcb-config-00.html#section-3-4) says:\r\n\r\n> If this path parameter is not present, oblivious requests can be made to the root \"/\" path.\r\n\r\n... on which server?",
+      "createdAt": "2022-03-08T05:28:22Z",
+      "updatedAt": "2022-05-27T04:34:08Z",
+      "closedAt": "2022-05-27T04:34:08Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is meant to be the path on the target server, not the proxy. The client would need to work with the proxy to know how the target maps to a request.\r\n\r\nThe entity publishing the target config only knows about the target name and path, not the proxy info. Knowing how a proxy does mappings is out of scope here, I think.",
+          "createdAt": "2022-03-08T05:33:38Z",
+          "updatedAt": "2022-03-08T05:33:38Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "FYI @chris-wood , since you had asked for the path parameter to be added.",
+          "createdAt": "2022-03-08T05:35:16Z",
+          "updatedAt": "2022-03-08T05:35:16Z"
+        },
+        {
+          "author": "martinthomson",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "New version out, this appears OBE.",
+          "createdAt": "2022-05-27T04:34:08Z",
+          "updatedAt": "2022-05-27T04:34:08Z"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "I_kwDOG3oZ-85FRlao",
+      "title": "A client has to trust the oblivious proxy resource",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/13",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "If it gets this via a discovery process, how does it know that it can trust that resource?",
+      "createdAt": "2022-03-08T05:29:05Z",
+      "updatedAt": "2022-07-05T19:45:53Z",
+      "closedAt": "2022-07-05T19:45:52Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "In this model, the client isn't discovering the proxy \u2014 it's discovering the target, and has a proxy that it trusts already. Proxy discovery would be a separate mechanism.",
+          "createdAt": "2022-03-08T05:34:39Z",
+          "updatedAt": "2022-03-08T05:34:39Z"
+        },
+        {
+          "author": "martinthomson",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I see.  That wasn't at all clear.  OHTTP doesn't really let you choose a target at the proxy though, so how would you propose that the client discover the oblivious proxy resource?",
+          "createdAt": "2022-03-09T04:08:08Z",
+          "updatedAt": "2022-03-09T04:08:08Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The client would be using a proxy it already knows about or knows can handle this target.",
+          "createdAt": "2022-03-15T20:51:05Z",
+          "updatedAt": "2022-03-15T20:51:05Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Text has since clarified that this doesn't cover discovery of the proxy / relay. We can have further discussion if people think it's needed (beyond having client-selected/trusted relays).",
+          "createdAt": "2022-07-05T19:45:52Z",
+          "updatedAt": "2022-07-05T19:45:52Z"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOG3oZ-85KhsXL",
+      "title": "Needs more details for OHTTP",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/16",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The current document is a little light on detail, probably a little *too* light.\r\n\r\nFirstly, it needs to be directly acknowledged that the assertion being made here is that ALL resources on an HTTP server are accessible using OHTTP.  That is all the HTTPS record is able to assert.  See also, the closed #12, which talked about `ohttp-path`.  This is fine, as OHTTP doesn't really care what you put inside the encrypted message to the oblivious request resource, so an origin-wide assertion works fine as long as your intermediaries (proxy and request resources) are OK with it.\r\n\r\nWhat you then need in order to make a request is a) an oblivious proxy resource, and b) an oblivious request resource.  The draft acknowledges the need for the first and says that you bring your own.  What it doesn't say is how to get the latter.  \r\n\r\nAs OHTTP depends on these being independent entities, it isn't at all clear that the choice of oblivious request resource follows from your choice of oblivious proxy resource OR the choice of oblivious target resource.\r\n\r\nIt's possible that clients will have separate arrangements with entities that operate both proxy and request resources, entities that are independent of this target.  That's probably the ideal situation.\r\n\r\nAs we've discussed though, it makes a fair bit of sense to co-locate the request resource with the target.  For that, you need to know which resource on the server serves that function.  A .well-known for that is a possibility, though I might prefer not to overuse .well-known and might instead suggest that you would provide a path to the request resource in configuration.  There is no harm in allowing configuration for that resource.",
+      "createdAt": "2022-05-27T05:09:17Z",
+      "updatedAt": "2022-07-05T19:42:21Z",
+      "closedAt": "2022-07-05T19:42:21Z",
+      "comments": [
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think there's some confusion in terminology going on here. As I understand the situation, the path parameter (which still seems necessary) discussed in #12 was for the oblivious request resource, not the oblivious target resource. It's unfortunate that the request resource is referred to as the target in ODoH, which seems to contribute to the confusion.\r\n\r\nIn any case, maybe adding the path to the .well-known endpoint that vends out keys is a reasonable way forward. @bemasc rightfully points out that these need to be treated atomically anyway from a consistency perspective. Then there'd be one simple way to fetch a configuration.",
+          "createdAt": "2022-05-27T10:54:28Z",
+          "updatedAt": "2022-05-27T10:54:28Z"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOG3oZ-85Khtfw",
+      "title": ".well-known is a poor fit for key configuration",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/17",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The document talks about discovering *targets*, or oblivious target resources. It also specifies a location for a key configuration.\r\n\r\nThe key configuration is a property of the oblivious ***request*** resource.  As the configuration provides information about oblivious target resources, this is not a good fit.\r\n\r\nAlso, as a single oblivious request resource is able to serve a large number of target resources, I would instead suggest that a link relation - a more appropriate a method of providing any sort of configuration for a single resource - is also better suited to this application.\r\n\r\n`.well-known` provides information about entire servers.  Origin-wide configuration, where there might be multiple oblivious request resources on the same server, is inflexible.\r\n\r\nIf the goal is to facilitate discovery without specifying paths, then putting the path of the oblivious request resource into the SVCB (HTTPS really) configuration might work.  Or, if you don't like your configuration too explicit, a well-known location for an oblivious request resource that is able to forward oblivious requests to any oblivious target resource on the same origin might also work.",
+      "createdAt": "2022-05-27T05:17:32Z",
+      "updatedAt": "2022-07-05T19:42:21Z",
+      "closedAt": "2022-07-05T19:42:21Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "As terminology has improved, the document now is clear that this is about identifying an oblivious gateway resource and its configuration.\r\n\r\nI don't think a link relation, directly, would make sense for this discovery mode (since you'd need to get the relation from some original request with a link header), but there may be a good analogy we can create in the SVCB parameters -- adding more info to let the gateway be separate from the target, and being explicit about that.",
+          "createdAt": "2022-07-04T20:57:24Z",
+          "updatedAt": "2022-07-04T20:57:24Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@martinthomson I'd be curious to hear your thoughts on the direction we could take with #21.",
+          "createdAt": "2022-07-04T22:17:06Z",
+          "updatedAt": "2022-07-04T22:17:06Z"
+        },
+        {
+          "author": "martinthomson",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'm not sure about #21.  Maybe I'm reading it wrong, but it seems like it is jumping to the end without building the necessary foundation pieces.\r\n\r\nFirst, let's set aside the key configuration piece for the moment.  It's important, but I'll get back to that.\r\n\r\nWithout specifying a specific destination, a client that wants to make an oblivious request needs to construct a route that comprises a relay, gateway, and target.  Each node needs to be willing to talk to the other (client<->relay, relay<->gateway, gateway<->target) for various reasons.\r\n\r\nYou can approach this problem several ways.  The first, obvious, and wrong option being that the client talks to its relay and asks where it can go.  A relay that is configured for a small subset of destinations might be able to give an answer that is narrow enough to be useful.  For instance, if we had a specific configuration that was just for DoH with a specific provider, then the relay would be able to help out.\r\n\r\nI expect that relays will be somewhat more flexible than that, which tends not to be very useful if you are looking to learn where you can go.  So it is likely that asking the relay is a poor choice.\r\n\r\nTaking it from the opposite end, the client might seek to turn a direct request to a target URI into an oblivious request.  Maybe it even has a set of target resources that it wants to make requests of. Again, to use DoH as an example, a DoH GET request is a set of target resources that a client might want to make oblivious.\r\n\r\nIn that model, you might consider asking the target URI about gateways that it is willing to talk to.  In that case, the target is likely to have a far narrower view of what it is willing to use.  Indeed, the best deployment of oblivious HTTP has the gateway resource running in the same server as the target resource.  That way, \"forwarding\" the decrypted request doesn't even need to involve `memcpy()`, let alone a new HTTP request.\r\n\r\nTo that end, it makes sense to create an origin-wide configuration that says \"if you want to make an oblivious request to any resource on this server, this is the oblivious gateway resource to use\".  I think that is *functionally* what you have here, almost.  However, you are framing this as \"find a gateway\", which I think is wrong.  If you are a client looking to establish a route, you don't start in the middle.  The gateway is not a ends, it is simply a means.\r\n\r\nSo I think that what you have is a `.well-known` resource that makes a claim about all resources on a server.  This resource identifies one (or more!) resources that can be used as oblivious gateway resources.  All resources on that server can be accessed as a target resource using oblivious HTTP via any one of the identified oblivious gateway resources.  (As you note, you probably don't want the gateway resource to be a target, so any gateway resource might be implicitly excluded...if it happens to be on the same server.)\r\n\r\nFor SVCB, when you present a `dohpath`, you are talking about a single resource, so you don't need to talk about multiple targets.  Well, except that DoH with GET really is multiple resources.  So the same applies: you have a set of target URIs for which you want to advertise a gateway.  Attaching an `oblivious-gateway` parameter to SVCB makes perfect sense.\r\n\r\nSo - functionally - what you have is right, but without talking about the target resource, you have a fairly confusing document.\r\n\r\nAs for key configuration, this is not a server-wide property.  It is specific to the gateway resource.  The gateway resource might not even be on the same server (though this isn't a problem as you created a separate resource...).  @bemasc suggested [elsewhere](https://bemasc.github.io/access-services/draft-schwartz-ohai-consistency-doublecheck.html) that we use what I'll call \"method overloading\" to acquire key configuration from the gateway resource.  I think that as much as overloading generates a knee-jerk negative response (too much experience with latent bugs when writing C++), that makes a lot of sense here.  You need the gateway resource to speak for itself. Sadly, OPTIONS doesn't work very well as it's not natively cacheable.\r\n\r\nYou write that `.well-known` is used to avoid targeting clients with specific key configurations.  You even acknowledge that your defense doesn't work. If the server is able to choose a per-client identity for the gateway resource, then it doesn't need a per-client key configuration. The identity of the gateway resource will identify the client adequately.  Relying on the DNS configuration being hard to manage is not a good defense for that.  My only conclusion there is that we'll need a consistency scheme for the identity of that resource too.\r\n\r\nPutting this all together, a client starts out with:\r\n\r\n* a target URI\r\n* a trustworthy relay that is willing to talk to virtually any gateway, configured with a URI template\r\n* a desire to use oblivious HTTP for that target URI\r\n\r\nThe client starts by turning the target URI into a `.well-known` resource.  It queries that resource (optionally, via the relay[^1]) and determines that the server has a gateway[^2].\r\n\r\nThe client then queries the gateway (again, probably via the relay) and requests key configuration[^2].\r\n\r\nThe client makes an oblivious request to the target via its configuration relay and the newly discovered gateway.\r\n\r\nAlternatively, the SVCB case starts with the client having:\r\n\r\n* a resource name\r\n* a service type\r\n* a trustworthy relay\r\n* a burning passion for making an oblivious request\r\n\r\nThe client does the SVCB thing and gets a record that includes `oblivious-gateway`, plus the identity of the target resource.  It can skip the bit where it fetches the `.well-known` resource, though it might need a consistency check that involves that fetch. It can then go straight to talking to the gateway and then the oblivious request.\r\n\r\nDoes that all make sense?\r\n\r\n[^1]: This only requires that the relay forward GET requests as well, which doesn't seem like a huge imposition here.  [Ben's draft](https://bemasc.github.io/access-services/draft-schwartz-ohai-consistency-doublecheck.html) suggests some pretty aggressive caching for this, which is a nice optimization - for both performance and privacy.\r\n\r\n[^2]: Let's leave the consistency thing as an unsolved problem for the moment.  All we need to do is describe how the information is established, not whether it is canon (correctness, not consistency...yet).\r\n\r\n\r\n",
+          "createdAt": "2022-07-05T01:20:46Z",
+          "updatedAt": "2022-07-05T01:20:46Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks, @martinthomson. That does make sense.\r\n\r\nI've pushed one commit to the branch to try to further clarify the target vs gateway. Some of this text got muddy in the transition of terminology.\r\n\r\nThe point _should_ be: the client is interested in a target resource, and in the process of fetching information (via DNS, etc) about the host that serves the target resource, it learns that (a) target resources for this service/host are accessible using Oblivious HTTP as Oblivious Target Resources, and (b) there exists an associated Oblivious Gateway Resource that ought to be used to access the target resource.\r\n\r\nI certainly think there can be further work done to improve the description and explanation, but based on your discussion above, I think we're agreeing on the intent of the mechanism here.\r\n\r\nRegarding the two usage scenarios you mention at the end, we're trying to address the latter case. The former may be interesting, but I haven't thought through any use cases for that. You're correct that in the latter case, the client doesn't need to be the one doing the well-known URI lookups \u2014 it can be the trusted relay.\r\n\r\nI think the mechanism to discover the key configuration and the target resource path is still an interesting question. Here are the options that I see:\r\n\r\n1. Identify the gateway via a name, and then use two separate well-known URIs on a gateway's name to separately serve the key configuration and the gateway requests. This is what the document describes.\r\n2. Identify the gateway via a full URI, and try to overload a way to grab the key configuration for that URI. As you mention above, I think this is a dangerous way to go.\r\n3. Identify the gateway and its config in two separate URIs in the discovery mechanism (SVCB, etc). This makes them separate and avoid well-known, but it doesn't necessarily seem better to me than just containing the entire config in the SVCB parameter instead, which was rejected in earlier discussion because allows various targeting or impersonation attacks. The problem here is that there isn't enough to tie the config and resource together.\r\n\r\nHence, I didn't see a significantly better option than (1).\r\n\r\nThoughts?",
+          "createdAt": "2022-07-05T03:08:04Z",
+          "updatedAt": "2022-07-05T03:08:04Z"
+        },
+        {
+          "author": "martinthomson",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "So I don't think that (1) is the best option.  Maybe I wasn't clear, but I think that (2) is better.  That way, the gateway resource speaks for itself.\r\n\r\n`.well-known` can and should be avoided here.  When naming `.well-known`, it's a shame that we missed the opportunity to name it `.block-chain`.  It's the first tool people reach for, when really it should be the last.",
+          "createdAt": "2022-07-05T04:17:40Z",
+          "updatedAt": "2022-07-05T04:17:40Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@martinthomson For (2), what is request that we should send to the gateway resource to ask it what its key configuration is? Did you have a specific idea in mind?",
+          "createdAt": "2022-07-05T04:30:32Z",
+          "updatedAt": "2022-07-05T04:30:32Z"
+        },
+        {
+          "author": "martinthomson",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "GET. See https://bemasc.github.io/access-services/draft-schwartz-ohai-consistency-doublecheck.html#section-4.2-3 (which describes the request going to the gateway via the relay.",
+          "createdAt": "2022-07-05T04:34:51Z",
+          "updatedAt": "2022-07-05T04:34:51Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Got it, I can adjust to that. ",
+          "createdAt": "2022-07-05T12:55:19Z",
+          "updatedAt": "2022-07-05T12:55:19Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "NONE",
+          "body": ">  @bemasc suggested elsewhere that we use what I'll call \"method overloading\" to acquire key configuration from the gateway resource.\r\n\r\nFWIW, that's not quite how I think about it.  What I was suggesting was really \"indirection\", not \"overloading\":\r\n\r\n1. The Gateway is identified by a URL (`URL #1`) holding a config file.\r\n2. You fetch (GET) this config file, which contains a URL (`URL #2`) of the actual Gateway Resource.\r\n3. You use (POST) `URL #2` as the Gateway Resource.\r\n\r\nIt's true that you could make these two URLs the same, and use \"method overloading\" to disambiguate the requests.  I don't really know why you would want to do that, but also I guess it's fine.\r\n\r\n---\r\n\r\nI haven't attempted to fully grasp #21 yet, but I do think `.well-known` might actually be a good fit for some variants of the \"Oblivious DoH transparent upgrade\" that seems to be a goal of this draft.  In my view, the key observation is that, in Oblivious HTTP, we assume (perhaps wrongly...) that the \"bootstrap seed\" is consistent (i.e. not targeted), and require that any subsequent operations maintain that consistency.  If the \"bootstrap seed\" is a domain name (e.g. DDR by name), then `.well-known` may be a natural way to discover a corresponding \"ODoHv2\" Target and Gateway.  I think `dohpath` and OHTTP probably don't work together, due to consistency concerns.",
+          "createdAt": "2022-07-05T14:08:28Z",
+          "updatedAt": "2022-07-05T14:09:03Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Okay, @martinthomson, I've adjust #21 to include the full gateway URI in the SVCB record, and use a GET to the URI to get the key config.",
+          "createdAt": "2022-07-05T18:05:41Z",
+          "updatedAt": "2022-07-05T18:05:41Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@bemasc I don't think dohpath is a problem here \u2014 dohpath is the path of the _target_ resource. It's still useful when making the end-to-end encapsulated request. The gateway URI to which you send your encrypted requests is unrelated to that.",
+          "createdAt": "2022-07-05T18:06:31Z",
+          "updatedAt": "2022-07-05T18:06:31Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "NONE",
+          "body": "The problem is that `dohpath` breaks the consistency assumptions of Oblivious HTTP.\r\n\r\nLet's say you start with a resolver known by its name, `resolver.example`.  You assume (without proof!) that lots of people are using `resolver.example`.  You also know that `resolver.example` support \"ODoHv2\".  How do you connect?  First you do a SVCB query for `_dns.resolver.example`, which gives you the `dohpath` ... but this query is not consistency-protected, so `resolver.example` could return `dohpath=/dns-query-123456789{?dns}` (with TTL=0 to prevent DNS caching).  Now you issue \"oblivious\" queries to `https://resolver.example/dns-query-123456789`, but your queries are all linkable because you are the only client hitting that URL.  This breaks OHTTP's privacy claims.\r\n\r\nThis is why I think we need to [encapsulate the Target and Gateway URIs together](https://datatracker.ietf.org/doc/draft-schwartz-masque-access-descriptions/), and [apply consistency checks to them as a unit](https://datatracker.ietf.org/doc/draft-schwartz-ohai-consistency-doublecheck/).",
+          "createdAt": "2022-07-05T18:29:13Z",
+          "updatedAt": "2022-07-05T18:29:13Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah, this is about the consistency checks. I think that's interesting to discuss, but I don't think it directly impacts this mechanism. We need to have a broader discussion about the approach to consistency checks. Checking for consistency as a unit is separate from encapsulating them together in the discovery mechanism.",
+          "createdAt": "2022-07-05T18:47:08Z",
+          "updatedAt": "2022-07-05T18:47:08Z"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "id": "I_kwDOG3oZ-85Khu9V",
+      "title": "Hiding IP when getting key configuration",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/18",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "> When clients fetch a target's configuration using the well-known URI, they can expose their identity in the form of an IP addres if they do not connect via a proxy or some other IP-hiding mechanism. Clients SHOULD use a proxy or similar mechanism to avoid exposing client IPs to a target.\r\n\r\nFetching key configuration does not necessarily reveal sensitive information other than that the client is interested in the answer.  It is worth pointing out that clients that wish to hide any interest in the resources provided by the server might want to break any tie between their IP address and this interest, but there are lots of cases where that is not necessary.\r\n\r\nFor instance, we might not find it useful to try to hide the fact that Firefox is running on a particular computer.  If Firefox requests oblivious key configuration information from our chosen DNS provider, all that we reveal is that Firefox is running, something we will reveal soon afterwards by virtue of establishing TLS connections to a bunch of servers.  So there is little value in us protecting this information.\r\n\r\nIt might be better to frame this in a more nuanced fashion.  Talk instead about the consequences of leaking information about interest in the services being offered and how that is tied to network identity unless protective measures are taken (proxy, MASQUE, VPN, Tor, etc...)  A \"SHOULD\" is not appropriate, depending on circumstances.",
+      "createdAt": "2022-05-27T05:27:31Z",
+      "updatedAt": "2022-07-05T16:28:18Z",
+      "closedAt": "2022-07-05T16:28:18Z",
+      "comments": [
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "In a typical DNR/DDR use case, the oblivious target will be deployed by the network-provider and it not only knows the client IP address but also the client identity. If the client fetches the key configuration from the oblivious target directly, it would know the client identity interested to use the oblivious target. Most importantly, if the client directly fetches the key configuration from the oblivious target, it is easily susceptible to targeted key configuration attack.\r\n\r\n",
+          "createdAt": "2022-05-31T07:50:16Z",
+          "updatedAt": "2022-05-31T07:50:16Z"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOG3oZ-85Khyd8",
+      "title": "Encrypted DNS isn't sufficient",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/19",
+      "state": "CLOSED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "> Attackers on a network can remove SVCB information from cleartext DNS answers [...] Use of encrypted DNS or DNSSEC also can be used as mitigations.\r\n\r\nThese two things are very different.  DNSSEC provides integrity and so - if it is used - is effective.  Of course, it is pretty hard to *get* DNSSEC responses at a stub resolver reliably, but that doesn't mean you can't recommend it.\r\n\r\nEncrypted DNS (DoH, DoT, etc...) helps differently.  It means that you are no longer exposed to network-based attackers.  But that assumes three things if you don't have DNSSEC:\r\n\r\n1. you are able to get (authenticated and) encrypted DNS to the recursive resolver\r\n2. your recursive resolver doesn't strip SVCB (or the oblivious flag; or the entire mandatory=oblivious RRs) from responses\r\n3. you are able to get (authenticated and) encrypted DNS between the recursive and the authoritative.\r\n\r\nYou can drop the last if your recursive does DNSSEC validation for you, which means you are relying on having encrypted DNS *and* DNSSEC.",
+      "createdAt": "2022-05-27T05:53:39Z",
+      "updatedAt": "2022-07-05T19:44:30Z",
+      "closedAt": "2022-07-05T19:44:30Z",
+      "comments": [
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Good points. If the client does not support DNSSEC, it has to have a authenticated encrypted connection to the recursive resolver and the resolver has to do DNSSEC validation (signaling to the client that it has done DNSSEC validation using AD bit). \r\n\r\nAs per https://datatracker.ietf.org/doc/html/rfc5625#section-4.3, resolvers must handle Resource Records (RRs) of unknown type transparently. Resolvers shouldn't be modifying the SVCB RR type. \r\n",
+          "createdAt": "2022-05-27T07:10:33Z",
+          "updatedAt": "2022-05-27T07:10:33Z"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "id": "I_kwDOG3oZ-85OmHLG",
+      "title": "Ensure that the gateway is trusted for the target",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/23",
+      "state": "CLOSED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We need to ensure that an attacker can't put an illegitimate gateway in for a service.\r\n\r\nThis likely has the form that:\r\n- The target and gateway need to be colocated / share the same TLS certificate\r\n- The config/gateway likely needs to be well-known",
+      "createdAt": "2022-07-26T18:31:33Z",
+      "updatedAt": "2022-07-27T15:18:09Z",
+      "closedAt": "2022-07-27T15:18:09Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think the goals are:\r\n\r\n- Solution must link the target and gateway\r\n    - Same hostname is OK, so you know that the certificate is covered\r\n    - It's possible that SVCB points to different sets of addresses that support non-OHTTP target instances from OHTTP gateway+target instances. To support such cases, the relay likely SHOULD do the same SVCB query to find the gateway instance.\r\n- Must not be able to split off separate paths that are controllable by someone else behind the server\r\n    - Control over well-known for at least the config is needed",
+          "createdAt": "2022-07-26T20:04:30Z",
+          "updatedAt": "2022-07-26T20:04:30Z"
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "id": "I_kwDOG3oZ-85Oufr7",
+      "title": "Informational status",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/25",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Any specific reason for using Informational status for the draft ?                                ",
+      "createdAt": "2022-07-28T11:47:11Z",
+      "updatedAt": "2022-10-12T15:40:55Z",
+      "closedAt": "2022-10-12T15:40:55Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Nope, it should be proposed standard!",
+          "createdAt": "2022-07-28T14:10:56Z",
+          "updatedAt": "2022-07-28T14:10:56Z"
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "id": "I_kwDOG3oZ-85Ouqne",
+      "title": "Unique DoH path attack",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/26",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Some options include: only allow common DoH paths (such as the de-facto default \"/dns-query{?dns}\");\r\nperforming consistency checks by fetching the information about the resolver over multiple resolution paths; or coordinating with a\r\ntrusted oblivious relay to validate that DoH paths are common across clients using the same gateway.\r\n\r\nComment> The consistency check discussed above in security considerations section is not clear to me. For example, in case of DNR, the client will use DHCP/RA to learn the DoH path and it can use discovered ADN or Do53 to do the the SVCB lookup to cross-check both DoH paths are matching. \r\n\r\nI don't get how the client will co-ordinate with a oblivious relay to validate that DoH path. Is the client supposed to use the de-facto URI path to retrieve the actual URI path from the Oblivious DoH service.  ",
+      "createdAt": "2022-07-28T12:26:16Z",
+      "updatedAt": "2022-08-11T09:20:37Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I was thinking that either you would:\r\n- Check that the path in the SVCB response is the same if you look it up locally and publicly (two resolvers)\r\n- Have some proprietary method to reveal what the interior DoH path is to the relay, and the relay can reject requests to paths that look like targeting.",
+          "createdAt": "2022-07-28T14:13:49Z",
+          "updatedAt": "2022-07-28T14:13:49Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I like the first approach compared to the proprietary method :)",
+          "createdAt": "2022-07-28T14:33:38Z",
+          "updatedAt": "2022-07-28T14:33:38Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I see draft-schwartz-ohai-consistency-doublecheck solves the problem by including the DoH path in the service description host. ",
+          "createdAt": "2022-07-28T14:57:46Z",
+          "updatedAt": "2022-07-28T14:57:46Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, that works if you have some such dictionary file. ",
+          "createdAt": "2022-07-28T15:06:10Z",
+          "updatedAt": "2022-07-28T15:06:10Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "we may want to consider using a separate section to list the possible remediation mechanisms to detect unique DoH path attack.",
+          "createdAt": "2022-08-11T09:20:36Z",
+          "updatedAt": "2022-08-11T09:20:36Z"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "id": "I_kwDOG3oZ-85To1qY",
+      "title": "Oblivious Targets and certificates with referring IP addresses.",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/28",
+      "state": "OPEN",
+      "author": "jaymoreau",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "In section 4.2.1, it suggests using the TLS certificate check described in [DDR], but the DDR certificate check requires listing valid referring IP addresses and then checking those. If the client is not connecting to the oblivious target directly, referring IP addresses would not be useful. The draft should have something explicit here around what validation can take place when clients connect through the Oblivious Proxy. Even if one were to connect directly to Oblivious Target for fetching keys and/or well known proxies and then connect through the proxy, there doesn't appear to be a way to validate IPs in a SAN for the Oblivious Target connection with what is described. The Oblivious Proxy should validate the TLS certificate hostname, and Oblivious Proxies can maintain trusted Oblivious Target hostname lists. Can we add language to loosen this requirement?",
+      "createdAt": "2022-10-10T13:50:40Z",
+      "updatedAt": "2022-10-21T10:52:19Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "In this case, the client must use a transport proxy to check if the oblivious target certificate includes the IP address or not. It cannot use a HTTPS proxy. \r\n\r\nI don't see a need to relax the verified discovery defined in Section 4.2 of DDR otherwise the client will end-up doing opportunistic discovery.",
+          "createdAt": "2022-10-21T10:51:50Z",
+          "updatedAt": "2022-10-21T10:52:19Z"
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "id": "I_kwDOG3oZ-85T1HKc",
+      "title": "DNS media type",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/29",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "discuss"
+      ],
+      "body": "Ralf Weber pointed out the DNS media type we mention is application/dns-message. We likely need a specific type defined for doing DNS-over-OHTTP (slightly different from the previous ODoH type) that would be the outer type, or have the application/oblivious-dns-message be defined to allow this use in OHTTP (although that would be ambiguous).",
+      "createdAt": "2022-10-12T15:43:02Z",
+      "updatedAt": "2022-11-09T13:27:23Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bemasc",
+          "authorAssociation": "NONE",
+          "body": "I think the outer type should be `message/ohttp-req`.  I see no reason for the client to reveal to the relay whether a particular request is DoH or some other usage of HTTP.",
+          "createdAt": "2022-10-12T17:38:20Z",
+          "updatedAt": "2022-10-12T17:38:20Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "For what it's worth, I agree with Ben here. ",
+          "createdAt": "2022-10-12T23:29:41Z",
+          "updatedAt": "2022-10-12T23:29:41Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Agree with Ben. ",
+          "createdAt": "2022-10-21T10:39:20Z",
+          "updatedAt": "2022-10-21T10:39:20Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The current text is talking about the _inner_ request type.\r\n\r\nFor HTTPS services, it says:\r\n\r\n> For the \"https\" scheme, which uses the HTTPS RR type instead of SVCB, the presence of the \"oblivious\" parameter means that the target being described is an Oblivious HTTP service that is accessible using the default \"message/bhttp\" media type.\r\n\r\nFor DNS services, it says:\r\n\r\n> For the \"dns\" scheme, as defined in DNS-SVCB, the presence of the \"oblivious\" parameter means that the DNS server being described is an Oblivious DNS over HTTP (DoH) service. The default media type expected for use in Oblivious HTTP to DNS resolvers is \"application/dns-message\".\r\n\r\nThis isn't talking about the outer type, but rather than the content of the message is application/dns-message.\r\n\r\nThe question then is what the outer type is. The main OHTTP document says it _shouldn't_ be ohttp-req\r\n\r\n> Future specifications may repurpose the encapsulation mechanism described in this document. This requires that the specification define a new media type.\r\n\r\nWhich I don't love, because it does tell relays and everyone what kind of content you're sending... but that's what it says at the moment.",
+          "createdAt": "2022-11-05T22:40:48Z",
+          "updatedAt": "2022-11-05T22:40:48Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah! If this is the inner content type, then I've no objections. This content type is never revealed to the relay, it's only only used to ensure safe separation across protocols and content agreement between client and gateway. OHTTP doesn't require the outer content type to change -- is must always be message/ohttp-req or whatever. It only requires the content type of used in the key schedule to be unique for the inner content type.\n\nSo all in all there's no issue with choosing a new type, which seems to be suggested with the last comment?",
+          "createdAt": "2022-11-05T23:02:57Z",
+          "updatedAt": "2022-11-05T23:18:25Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "NONE",
+          "body": "@chris-wood I don't think you're saying the same thing as @tfpauly ...\r\n\r\n> For the \"dns\" scheme, as defined in DNS-SVCB, the presence of the \"oblivious\" parameter means that the DNS server being described is an Oblivious DNS over HTTP (DoH) service.\r\n\r\nI think this might be source of the problem.\r\n\r\nWe've been using the term \"Oblivious DoH' as a shorthand for this protocol, but I think the protocol should actually be \"DoH using Oblivious HTTP\".  In that arrangement, this is a perfectly ordinary HTTP transaction, using Oblivious HTTP as usual, with an outer type of `message/ohttp-req` and an inner type of `message/bhttp`, which in turn contains a GET or POST request, the latter with an `application/dns-message` Content-Type.\r\n\r\nIn this formulation, the \"oblivious\" parameter is not used directly by DNS-SVCB.  The SVCB-DNS spec says:\r\n\r\n> All keys specified for use with the HTTPS record are also permissible, and apply to the resulting HTTP connection.\r\n\r\nThis is where `oblivious` would come into play, modifying the HTTP connection used for DoH.  So instead, this draft could say\r\n\r\n> For the \"dns\" scheme, if an HTTP ALPN ID is present, the \"oblivious\" parameter modifies the HTTP connection that underlies each DoH request.  Clients that support Oblivious HTTP SHOULD disable any other use of this record or ensure that any other use provides privacy equivalent to Oblivious HTTP.  Clients also SHOULD disable any DNS features that would allow linking of independent DNS requests, such as DNS Cookies.\r\n\r\n-----\r\n\r\nRegarding the guidance in OHTTP:\r\n\r\n> Future specifications may repurpose the encapsulation mechanism described in this document.\r\n\r\nYes, I think this would apply to non-HTTP uses of the Oblivious Relay and Gateway ... but DoH is not a non-HTTP use case.",
+          "createdAt": "2022-11-05T23:47:11Z",
+          "updatedAt": "2022-11-05T23:47:11Z"
+        },
+        {
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The OHTTP guidance is as follows: the outer content type never changes, and the key schedule content type must match that of the inner content type. I think Ben's interpretation of what's actually happening here (DoH using Oblivious HTTP) is correct.",
+          "createdAt": "2022-11-05T23:53:09Z",
+          "updatedAt": "2022-11-06T00:32:55Z"
+        },
+        {
+          "author": "bemasc",
+          "authorAssociation": "NONE",
+          "body": "Unfortunately, I now understand that Section 4.6 of OHTTP is contributing to the confusion.  Instead of \"DoH using Oblivious HTTP\", it imagines something like \"Oblivious DNS using an OHTTP Relay\" in which:\r\n\r\n* The outer Content-Type is a new type, not `message/ohttp-req`.\r\n* The inner \"info string\" is `application/dns-message (request|response)`.\r\n* There is no DoH URI template or `dohpath`.\r\n\r\nThis approach has nothing whatsoever to do with RFC 8484 DoH.  It's a completely new DNS transport that happens to reuse some parts of the OHTTP system, relying on an Oblivious Gateway that changes its behavior based on the outer Content-Type.\r\n\r\nThis approach is coherent, but it requires a custom DNS-aware Gateway, prevents the use of multiple DNS endpoints via a single Gateway, and leaks the distinction between DNS and HTTP requests to the Relay.  On the other hand, it avoids complications about ensuring the consistency of the `dohpath`, and reduces message overhead.\r\n\r\nI think draft-ohai-svcb-config hasn't quite figured out which of these two proposals it's recommending.  It should probably pick one, and draft-ietf-ohai-ohttp should be updated to match it.",
+          "createdAt": "2022-11-07T18:03:56Z",
+          "updatedAt": "2022-11-07T18:03:56Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm going to lean towards just using BHTTP as an extra layer of wrapping, and let it be standard OHTTP. That should be simplest. I'll propose this in the meeting.",
+          "createdAt": "2022-11-07T20:04:13Z",
+          "updatedAt": "2022-11-07T20:04:13Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "115 meeting agreed that this should just be standard OHTTP Gateway (with BHTTP) + standard DoH server.",
+          "createdAt": "2022-11-09T13:27:23Z",
+          "updatedAt": "2022-11-09T13:27:23Z"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "I_kwDOG3oZ-85T1IIk",
+      "title": "SVCB parameter name",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/30",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "discuss"
+      ],
+      "body": "From Ben Schwartz:\r\n\r\n> The use of the name \"oblivious\" for the SvcParam has the potential to create a conflict or ambiguity.  For example, we risk creating confusion if someone defines \"Oblivious CoAP\" and advertises both DoH and DNS-over-CoAP in a DNS-SVCB record.  I think \"ohttp\" is probably a better name.",
+      "createdAt": "2022-10-12T15:45:01Z",
+      "updatedAt": "2022-11-09T13:26:52Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "115 consensus seems to be to use `ohttp` as the parameter name, and clarify that it always means standard OHTTP/BHTTP.",
+          "createdAt": "2022-11-09T13:26:52Z",
+          "updatedAt": "2022-11-09T13:26:52Z"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "id": "I_kwDOG3oZ-85T1JIB",
+      "title": "Motivation for network-chosed oblivious DNS responses",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/issues/31",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "From Ben Schwartz:\r\n\r\n> The introduction discusses a hypothetical resolver that \"applies local network resolution policies\".  This seems to touch on a sensitive topic unnecessarily.  I prefer the angle from Section 3 (\"more optimized or more relevant\").\r\n",
+      "createdAt": "2022-10-12T15:47:06Z",
+      "updatedAt": "2022-10-12T15:47:06Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOG3oZ-84zTR3S",
+      "title": "\"oblivious-keys\" to \"oblivious-configs\"",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/1",
+      "state": "MERGED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-02-22T18:02:37Z",
+      "updatedAt": "2022-02-22T18:08:13Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "5542c9c21e65243cc090cb6d2b01fecc2fe70e94",
+      "headRepository": "chris-wood/draft-ohai-svcb-config",
+      "headRefName": "caw/keys-to-configs",
+      "headRefOid": "6449af638b4b4ee7253772415482e5efe374877d",
+      "closedAt": "2022-02-22T18:08:13Z",
+      "mergedAt": "2022-02-22T18:08:13Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "5e6c43165d4d1d4453eb1ed9540799191078095b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-841DwrW",
+          "commit": {
+            "abbreviatedOid": "690fe72"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-02-22T18:07:07Z",
+          "updatedAt": "2022-02-22T18:07:07Z",
+          "comments": [
+            {
+              "originalPosition": 117,
+              "body": "```suggestion\r\n| TBD     | oblivious-configs | Oblivious HTTP key configurations         | (This document) |\r\n```",
+              "createdAt": "2022-02-22T18:07:07Z",
+              "updatedAt": "2022-02-22T18:07:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-841Dwvi",
+          "commit": {
+            "abbreviatedOid": "690fe72"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-02-22T18:07:21Z",
+          "updatedAt": "2022-02-22T18:07:21Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDOG3oZ-84zTXDN",
+      "title": "Fix some typos",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/6",
+      "state": "MERGED",
+      "author": "chris-wood",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-02-22T18:31:03Z",
+      "updatedAt": "2022-02-22T20:11:08Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "5e6c43165d4d1d4453eb1ed9540799191078095b",
+      "headRepository": "chris-wood/draft-ohai-svcb-config",
+      "headRefName": "patch-1",
+      "headRefOid": "e2c4898c97d0650ddf4db8143a0e5367c8330306",
+      "closedAt": "2022-02-22T20:11:08Z",
+      "mergedAt": "2022-02-22T20:11:08Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "e802f704574c8e9fbe67552194ec1d8105c6ae73"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-841EQgB",
+          "commit": {
+            "abbreviatedOid": "e2c4898"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-02-22T20:11:04Z",
+          "updatedAt": "2022-02-22T20:11:04Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDOG3oZ-84zTr2F",
+      "title": "Reference key consistency",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/7",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Closes #4",
+      "createdAt": "2022-02-22T20:30:30Z",
+      "updatedAt": "2022-02-22T21:02:56Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "e802f704574c8e9fbe67552194ec1d8105c6ae73",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-1",
+      "headRefOid": "0308f5f93a92e6ba0e659268f005c8cc159084c1",
+      "closedAt": "2022-02-22T21:02:56Z",
+      "mergedAt": "2022-02-22T21:02:56Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "68cddaccd9b6a6a26c9fcad995d90f638305bb0b"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDOG3oZ-84zTxlT",
+      "title": "Explain direct verification of ODoH target",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/8",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #5",
+      "createdAt": "2022-02-22T21:05:30Z",
+      "updatedAt": "2022-02-22T21:14:33Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "68cddaccd9b6a6a26c9fcad995d90f638305bb0b",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-2",
+      "headRefOid": "75719c8390b2e5eeddad0148b1187884a0fef56b",
+      "closedAt": "2022-02-22T21:14:33Z",
+      "mergedAt": "2022-02-22T21:14:33Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "96282c4027d06af7ec27e1db1033eec512ad28b2"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-841EdoR",
+          "commit": {
+            "abbreviatedOid": "75719c8"
+          },
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-02-22T21:06:28Z",
+          "updatedAt": "2022-02-22T21:06:28Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "PR_kwDOG3oZ-84zsJJx",
+      "title": "Add explicit keys for OHTTP-Path and ODoH-Configs",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/9",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #2 \r\nCloses #3 ",
+      "createdAt": "2022-02-28T21:36:32Z",
+      "updatedAt": "2022-02-28T22:00:48Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "96282c4027d06af7ec27e1db1033eec512ad28b2",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-3",
+      "headRefOid": "1f24def588254ccd4daf46afd66a8b87f536c412",
+      "closedAt": "2022-02-28T22:00:48Z",
+      "mergedAt": "2022-02-28T22:00:48Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "34a491133562f358093f5355ecf575b2f389a7a4"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-841YhT6",
+          "commit": {
+            "abbreviatedOid": "1f24def"
+          },
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-02-28T21:37:57Z",
+          "updatedAt": "2022-02-28T21:37:57Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "PR_kwDOG3oZ-84z_L6A",
+      "title": "Co-author draft",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/10",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-03-05T07:43:03Z",
+      "updatedAt": "2022-03-05T15:02:03Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "2373fe260b8efa09ef46c3942581fc4312012b09",
+      "headRepository": "tireddy2/draft-ohai-svcb-config",
+      "headRefName": "main",
+      "headRefOid": "47ba8bfff47319d12d7335e3f469ff2dfe4b74d5",
+      "closedAt": "2022-03-05T15:02:03Z",
+      "mergedAt": "2022-03-05T15:02:03Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "ae8469bf109b42f9c79367f5be1b9e1c0d39658e"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOG3oZ-8435ji6",
+      "title": "Rework of protocol based on IETF 113 feedback",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/14",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "The main change here is to change the SVCB parameter to a boolean, and have a well-known URI to fetch the config from the target server.",
+      "createdAt": "2022-05-16T18:25:31Z",
+      "updatedAt": "2022-05-25T15:08:34Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "c0e215f4c0c3feb119c6be6365af7e2332c5327c",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfp/rework",
+      "headRefOid": "cdc8f301e6e334f608a609be658b9a7bac7a59ab",
+      "closedAt": "2022-05-25T15:08:34Z",
+      "mergedAt": "2022-05-25T15:08:34Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "8cfed20962c81d7601d68b6958b6e825d0dced39"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-846H-aZ",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-17T09:45:15Z",
+          "updatedAt": "2022-05-17T09:45:16Z",
+          "comments": [
+            {
+              "originalPosition": 214,
+              "body": "The proposed mechanism is susceptible to downgrade attack (not to use oblivious HTTP). I mean an attacker removing the oblivious SvcParamKey from the DNS response. Couple of possible ways to mitigate the attack could be (1) to perform the DNS SVCB query again after secure transport connection is established with the discovered DNS resolver (2) Rely on DNSSEC.",
+              "createdAt": "2022-05-17T09:45:15Z",
+              "updatedAt": "2022-05-17T11:45:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846IGPs",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-17T10:08:00Z",
+          "updatedAt": "2022-05-17T10:12:16Z",
+          "comments": [
+            {
+              "originalPosition": 171,
+              "body": "Rather than use the TargetName directly, should clients chase TargetNames down to a terminal node in the SVCB chain? For example, if _dns.resolver.arpa targets doh.example, and doh.example targets jk-this-doh.example, presumably the target the client should use is jk-this-doh.example, right?",
+              "createdAt": "2022-05-17T10:08:00Z",
+              "updatedAt": "2022-05-17T10:12:16Z"
+            },
+            {
+              "originalPosition": 160,
+              "body": "```suggestion\r\nClients that know a service is available as an oblivious target, e.g., \r\neither via discovery through the \"oblivious\" parameter in a SVCB or HTTPS\r\nrecord, or by configuration, need to know the key configuration before sending\r\noblivious requests.\r\n```\r\n\r\nSince the URI is separate from the discovery mechanism and could be used even for manually configured client/target arrangements.",
+              "createdAt": "2022-05-17T10:10:33Z",
+              "updatedAt": "2022-05-17T10:12:16Z"
+            },
+            {
+              "originalPosition": 224,
+              "body": "I might add some text here about how the SVCB parameter is just a hint, and clients _could_ choose to query every target for their oblivious configs if they wanted to. In that way, DNSSEC isn't required -- it's just an optimization.",
+              "createdAt": "2022-05-17T10:12:13Z",
+              "updatedAt": "2022-05-17T10:12:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846H-0T",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-17T09:46:26Z",
+          "updatedAt": "2022-05-17T11:45:52Z",
+          "comments": [
+            {
+              "originalPosition": 214,
+              "body": "We may want to refer to the Security Considerations discussed in https://datatracker.ietf.org/doc/html/draft-ietf-add-svcb-dns-03#section-8.",
+              "createdAt": "2022-05-17T09:46:26Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 210,
+              "body": "We can refer to https://datatracker.ietf.org/doc/draft-schwartz-ohai-consistency-doublecheck/, it discusses key consistency double check procedure. ",
+              "createdAt": "2022-05-17T10:01:55Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 205,
+              "body": "Is it possible for the client to discover multiple key configurations using the well-known URI ?\r\n",
+              "createdAt": "2022-05-17T10:05:12Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 219,
+              "body": "We may want to consider discussing the client behavior if the oblivious target stops publishing the key config or publishes a unique key per client. ",
+              "createdAt": "2022-05-17T10:18:25Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 148,
+              "body": "The line does is no longer relevant. The client will anyway have to connect to the oblivious target to discover the key config.",
+              "createdAt": "2022-05-17T11:13:11Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 208,
+              "body": "Directly connecting to the oblivious target will expose the client IP address to the oblivious target, we may want to discuss the privacy implications.",
+              "createdAt": "2022-05-17T11:15:14Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "We may want to elaborate on the deployment model assumed by this draft for DDR and DNR. For example, (1) the DNS server needs to have public access for the oblivious proxy to access it (2) client has an prior agreement with the oblivious proxy that the name and path of the oblivous target is encoded using a particular proxy URI template.",
+              "createdAt": "2022-05-17T11:34:06Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            },
+            {
+              "originalPosition": 63,
+              "body": "I am not sure why a target would only support oblivious HTTP for DNR/DDR use cases, please elaborate.",
+              "createdAt": "2022-05-17T11:36:38Z",
+              "updatedAt": "2022-05-17T11:45:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846Kl8G",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-17T17:32:08Z",
+          "updatedAt": "2022-05-17T17:32:08Z",
+          "comments": [
+            {
+              "originalPosition": 205,
+              "body": "Yes \u2014\u00a0the struct for `application/ohttp-keys` can contain multiple key configs",
+              "createdAt": "2022-05-17T17:32:08Z",
+              "updatedAt": "2022-05-17T17:32:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846KmM-",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-17T17:33:07Z",
+          "updatedAt": "2022-05-17T17:33:07Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "It could have multiple services listed \u2014\u00a0one generic DoH for DDR, and an entirely different record for their ODoH server.",
+              "createdAt": "2022-05-17T17:33:07Z",
+              "updatedAt": "2022-05-17T17:33:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846NCCW",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-18T07:42:11Z",
+          "updatedAt": "2022-05-18T07:42:12Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "It would be helpful to mention the above explanation in the DDR section. ",
+              "createdAt": "2022-05-18T07:42:12Z",
+              "updatedAt": "2022-05-18T07:42:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jXAd",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:08:42Z",
+          "updatedAt": "2022-05-23T21:08:42Z",
+          "comments": [
+            {
+              "originalPosition": 148,
+              "body": "No, it is still relevant \u2014 it may not direct connect to the IP address, it can go through a proxy.",
+              "createdAt": "2022-05-23T21:08:42Z",
+              "updatedAt": "2022-05-23T21:08:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jZpM",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:21:57Z",
+          "updatedAt": "2022-05-23T21:21:57Z",
+          "comments": [
+            {
+              "originalPosition": 214,
+              "body": "Added text in the security considerations section!",
+              "createdAt": "2022-05-23T21:21:57Z",
+              "updatedAt": "2022-05-23T21:21:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jZ-q",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:23:48Z",
+          "updatedAt": "2022-05-23T21:23:48Z",
+          "comments": [
+            {
+              "originalPosition": 171,
+              "body": "Clarified that this should be off of the ServiceMode.",
+              "createdAt": "2022-05-23T21:23:48Z",
+              "updatedAt": "2022-05-23T21:23:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jaUE",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:24:43Z",
+          "updatedAt": "2022-05-23T21:24:44Z",
+          "comments": [
+            {
+              "originalPosition": 224,
+              "body": "Added text about being a hint earlier in the security section.",
+              "createdAt": "2022-05-23T21:24:43Z",
+              "updatedAt": "2022-05-23T21:24:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jaap",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:24:54Z",
+          "updatedAt": "2022-05-23T21:24:55Z",
+          "comments": [
+            {
+              "originalPosition": 214,
+              "body": "Added a reference!",
+              "createdAt": "2022-05-23T21:24:54Z",
+              "updatedAt": "2022-05-23T21:24:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846ja8I",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:25:58Z",
+          "updatedAt": "2022-05-23T21:25:58Z",
+          "comments": [
+            {
+              "originalPosition": 210,
+              "body": "I'd rather not refer to that right now, since that's relying on configuration fetching that we don't have consensus on yet.",
+              "createdAt": "2022-05-23T21:25:58Z",
+              "updatedAt": "2022-05-23T21:25:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jbCU",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:26:28Z",
+          "updatedAt": "2022-05-23T21:26:28Z",
+          "comments": [
+            {
+              "originalPosition": 208,
+              "body": "I added more text about that in security considerations.",
+              "createdAt": "2022-05-23T21:26:28Z",
+              "updatedAt": "2022-05-23T21:26:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jbHy",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:26:54Z",
+          "updatedAt": "2022-05-23T21:26:54Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Added text in this section where we define the oblivious parameter.",
+              "createdAt": "2022-05-23T21:26:54Z",
+              "updatedAt": "2022-05-23T21:26:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jbQT",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:27:38Z",
+          "updatedAt": "2022-05-23T21:27:38Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Added text at the start of the oblivious DNS section for this!",
+              "createdAt": "2022-05-23T21:27:38Z",
+              "updatedAt": "2022-05-23T21:27:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846jbX3",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:28:15Z",
+          "updatedAt": "2022-05-23T21:28:16Z",
+          "comments": [
+            {
+              "originalPosition": 219,
+              "body": "Hm, I'm not sure exactly what to say at this point for that.",
+              "createdAt": "2022-05-23T21:28:15Z",
+              "updatedAt": "2022-05-23T21:28:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846kTLP",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T05:00:44Z",
+          "updatedAt": "2022-05-24T05:00:44Z",
+          "comments": [
+            {
+              "originalPosition": 210,
+              "body": "Fair point, we can revisit it later.",
+              "createdAt": "2022-05-24T05:00:44Z",
+              "updatedAt": "2022-05-24T05:00:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846kYA_",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T05:33:46Z",
+          "updatedAt": "2022-05-24T05:33:47Z",
+          "comments": [
+            {
+              "originalPosition": 219,
+              "body": "If the oblivious target stops publishing the key config or publishes a unique key per client, the client must not use the discovered oblivious DNS server and will fallback to use the pre-configured oblivious DNS server. ",
+              "createdAt": "2022-05-24T05:33:47Z",
+              "updatedAt": "2022-05-24T05:33:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846kcTX",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T05:59:58Z",
+          "updatedAt": "2022-05-24T05:59:58Z",
+          "comments": [
+            {
+              "originalPosition": 148,
+              "body": "If the client uses a proxy (e.g., HTTP CONNECT), it can still validate the TLS server certificate of the oblivious DNS server. I prefer the client validating the target certificate itself rather than relying on the oblivious proxy to do the validation on its behalf. ",
+              "createdAt": "2022-05-24T05:59:58Z",
+              "updatedAt": "2022-05-24T05:59:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846kiJc",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T06:28:32Z",
+          "updatedAt": "2022-05-24T06:28:32Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Thanks.",
+              "createdAt": "2022-05-24T06:28:32Z",
+              "updatedAt": "2022-05-24T06:28:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846nvM0",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T15:59:22Z",
+          "updatedAt": "2022-05-24T15:59:23Z",
+          "comments": [
+            {
+              "originalPosition": 219,
+              "body": "Added a sentence here about not using servers that do key targeting.",
+              "createdAt": "2022-05-24T15:59:23Z",
+              "updatedAt": "2022-05-24T15:59:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-846nvVO",
+          "commit": {
+            "abbreviatedOid": "22522ae"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T15:59:43Z",
+          "updatedAt": "2022-05-24T15:59:43Z",
+          "comments": [
+            {
+              "originalPosition": 148,
+              "body": "Ah, I see. I've re-written this paragraph to just say to do the normal TLS cert check!",
+              "createdAt": "2022-05-24T15:59:43Z",
+              "updatedAt": "2022-05-24T15:59:43Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDOG3oZ-844j2Y1",
+      "title": "Editorial fixes",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/15",
+      "state": "MERGED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-27T04:31:56Z",
+      "updatedAt": "2022-07-04T23:57:13Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "8cfed20962c81d7601d68b6958b6e825d0dced39",
+      "headRepository": "martinthomson/ohai-svcb-config",
+      "headRefName": "editorial",
+      "headRefOid": "866d1db2bec453a607718dd7a375a508986c3350",
+      "closedAt": "2022-07-04T20:30:12Z",
+      "mergedAt": "2022-07-04T20:30:12Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "584cca423db3a2809182a93f1f399c31a6a83a5c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-849RE7G",
+          "commit": {
+            "abbreviatedOid": "866d1db"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-07-04T20:30:08Z",
+          "updatedAt": "2022-07-04T20:30:08Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDOG3oZ-8460YOw",
+      "title": "Soften language about IP obfuscation",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/20",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #18 ",
+      "createdAt": "2022-07-04T20:47:46Z",
+      "updatedAt": "2022-07-05T16:28:19Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "893f521abea929ba6a16dc8fdae30d7391de168a",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-4",
+      "headRefOid": "e2bedc377be475ef5c308bb942d1cc942ed4b268",
+      "closedAt": "2022-07-05T16:28:19Z",
+      "mergedAt": "2022-07-05T16:28:18Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "3efdbe610b939f262db2da5ef351a83a7f1f7161"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-849R7RR",
+          "commit": {
+            "abbreviatedOid": "e2bedc3"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T06:30:26Z",
+          "updatedAt": "2022-07-05T06:30:37Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "In a typical DNR/DDR use case, the oblivious target will be deployed by the network-provider and it not only knows the client IP address but also the client identity (e.g., Network Access Identifier (NAI) or user identifier). If the client fetches the key configuration from the oblivious target directly, it would know the client identity interested to use the oblivious target and can be subjected targeted attacks (e.g., key targeting attack for an specific user in a mobile network).",
+              "createdAt": "2022-07-05T06:30:26Z",
+              "updatedAt": "2022-07-05T06:30:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849UTu8",
+          "commit": {
+            "abbreviatedOid": "e2bedc3"
+          },
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-07-05T14:27:36Z",
+          "updatedAt": "2022-07-05T14:27:36Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849U-HR",
+          "commit": {
+            "abbreviatedOid": "e2bedc3"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T16:28:15Z",
+          "updatedAt": "2022-07-05T16:28:15Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Agreed, in that case we definitely need to use a proxy -- that's the \"revealing its IP address will increase the risk...\".",
+              "createdAt": "2022-07-05T16:28:15Z",
+              "updatedAt": "2022-07-05T16:28:15Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "id": "PR_kwDOG3oZ-8460hUO",
+      "title": "Make SVCB parameter \"oblivious-gateway\"",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/21",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Closes #16\r\nCloses #17\r\n\r\nThis is a reconstruction of the discovery that changes from a boolean, to a name of the oblivious gateway.\r\n\r\nThe theory here is that if you're looking up records for a target you're trying to talk to, and looking up HTTPS records (for normal HTTP resources) or SVCB records (for DoH servers), you can get a parameter back indicating that there's an oblivious gateway that is designed specifically to work with this target. This parameter contains the URI of the oblivious gateway server.\r\n\r\nOf course, the oblivious gateway _can_ be co-located with the target resource, but they don't need to be. This was a bug in the previous approach to not allow them to be different.\r\n\r\nOnce you know this, you still need to know the configuration to use on the client to create the request. This is done by issuing a GET to the gateway resource.",
+      "createdAt": "2022-07-04T22:16:35Z",
+      "updatedAt": "2022-07-06T04:28:00Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "3efdbe610b939f262db2da5ef351a83a7f1f7161",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "gateway-param",
+      "headRefOid": "d3f3a9fc2c03b546b957d9d89810dddc20fba835",
+      "closedAt": "2022-07-05T19:42:21Z",
+      "mergedAt": "2022-07-05T19:42:21Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "700867bf7dea1157b276a5e8df87a470bae10048"
+      },
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@chris-wood @tireddy2  please take another look! I got rid of the well-known for now, to just put the entire gateway URI in the SVCB record, and fetch the key config with a GET.",
+          "createdAt": "2022-07-05T18:04:22Z",
+          "updatedAt": "2022-07-05T18:04:22Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Changes look good to me. We will have to discuss an on-path attacker replacing the oblivious gateway URI with the attacker's oblivious gateway in the \"oblivious-gateway\" parameter. One possible way to mitigate the attack would be to check for the client to check (via a proxy) if the certificate offered by the oblivous gateway is also valid for the oblvious target.",
+          "createdAt": "2022-07-06T04:28:00Z",
+          "updatedAt": "2022-07-06T04:28:00Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG3oZ-849RvPo",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T05:17:22Z",
+          "updatedAt": "2022-07-05T05:17:22Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "Remove \"aa\" in the above line. ",
+              "createdAt": "2022-07-05T05:17:22Z",
+              "updatedAt": "2022-07-05T05:17:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849Rv83",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T05:22:37Z",
+          "updatedAt": "2022-07-05T05:22:37Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Replace \"access\" with \"accessed\"",
+              "createdAt": "2022-07-05T05:22:37Z",
+              "updatedAt": "2022-07-05T05:22:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849R4y_",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T06:18:10Z",
+          "updatedAt": "2022-07-05T06:18:10Z",
+          "comments": [
+            {
+              "originalPosition": 306,
+              "body": "The above attack of different gateway names is possible with an malicious target aiming to identify clients. The attack can be mitigated by the client by using an pre-configured encrypted resolver to retrieve the SVCB records. The client can then compare this against the records retrieved using DNR/DDR to identify any targeted attack.",
+              "createdAt": "2022-07-05T06:18:10Z",
+              "updatedAt": "2022-07-05T06:18:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849UPWo",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "I would merge the contents of the two well-known responses together so they're atomic, otherwise this is a great improvement!",
+          "createdAt": "2022-07-05T14:16:38Z",
+          "updatedAt": "2022-07-05T14:26:59Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "```suggestion\r\nthe service (as an Oblivious Target Resource). This document also defines\r\n```",
+              "createdAt": "2022-07-05T14:16:38Z",
+              "updatedAt": "2022-07-05T14:27:00Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "```suggestion\r\nare accessed on the oblivious gateway indicated in the SVCB record.\r\n```",
+              "createdAt": "2022-07-05T14:17:35Z",
+              "updatedAt": "2022-07-05T14:27:00Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "```suggestion\r\nrelay configuration is out of scope for this document.\r\n```",
+              "createdAt": "2022-07-05T14:18:06Z",
+              "updatedAt": "2022-07-05T14:27:00Z"
+            },
+            {
+              "originalPosition": 305,
+              "body": "I might also add that this forces the existence of these gateway names to show up in places like CT, which means the malicious target can't deny the fact that they tried to target clients after the fact. ",
+              "createdAt": "2022-07-05T14:23:43Z",
+              "updatedAt": "2022-07-05T14:27:00Z"
+            },
+            {
+              "originalPosition": 286,
+              "body": "```suggestion\r\nRequests to this resource are expected to use the content type\r\n```",
+              "createdAt": "2022-07-05T14:24:36Z",
+              "updatedAt": "2022-07-05T14:27:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849VYpn",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T18:01:32Z",
+          "updatedAt": "2022-07-05T18:01:32Z",
+          "comments": [
+            {
+              "originalPosition": 305,
+              "body": "Agreed, but moved to a GET on the gateway path for now",
+              "createdAt": "2022-07-05T18:01:32Z",
+              "updatedAt": "2022-07-05T18:01:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849VZCr",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T18:02:10Z",
+          "updatedAt": "2022-07-05T18:02:11Z",
+          "comments": [
+            {
+              "originalPosition": 306,
+              "body": "This is changed now to not use a well-known",
+              "createdAt": "2022-07-05T18:02:10Z",
+              "updatedAt": "2022-07-05T18:02:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849VZFf",
+          "commit": {
+            "abbreviatedOid": "169a062"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-07-05T18:02:14Z",
+          "updatedAt": "2022-07-05T18:02:15Z",
+          "comments": [
+            {
+              "originalPosition": 306,
+              "body": "This is changed now to not use a well-known",
+              "createdAt": "2022-07-05T18:02:15Z",
+              "updatedAt": "2022-07-05T18:02:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG3oZ-849VtyG",
+          "commit": {
+            "abbreviatedOid": "d3f3a9f"
+          },
+          "author": "chris-wood",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "This variant seems reasonable to me, too \ud83d\udc4d ",
+          "createdAt": "2022-07-05T19:15:24Z",
+          "updatedAt": "2022-07-05T19:15:24Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDOG3oZ-8464Fw4",
+      "title": "Encrypted DNS and DNSSEC",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/22",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #19",
+      "createdAt": "2022-07-05T19:43:37Z",
+      "updatedAt": "2022-07-05T19:44:31Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "700867bf7dea1157b276a5e8df87a470bae10048",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-5",
+      "headRefOid": "bee6ac22a9ed3270198a4baf44f6d51294a4b61d",
+      "closedAt": "2022-07-05T19:44:30Z",
+      "mergedAt": "2022-07-05T19:44:30Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "191d4f7377d18927b646f1b907b41a8094670c10"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 24,
+      "id": "PR_kwDOG3oZ-848MD_p",
+      "title": "Bind the gateway to the target",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/24",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Closes #23\r\n\r\n- Move the SVCB parameter back to a boolean\r\n- Define a well-known off of the target for the gateway location, which can redirect to a more specific URI\r\n- Still fetch the config from the gateway itself",
+      "createdAt": "2022-07-27T15:11:52Z",
+      "updatedAt": "2022-07-27T15:18:09Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "191d4f7377d18927b646f1b907b41a8094670c10",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfp/back-to-wellknown",
+      "headRefOid": "a23222ab392dfa7e5b4321e38a57823a3159ebb2",
+      "closedAt": "2022-07-27T15:18:09Z",
+      "mergedAt": "2022-07-27T15:18:09Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "cc86aac0d7fe2b8fbf7ce9355e78b561a5b1bf8d"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 27,
+      "id": "PR_kwDOG3oZ-848QNbo",
+      "title": "Information -> proposed standard",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/27",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #25 ",
+      "createdAt": "2022-07-28T14:11:39Z",
+      "updatedAt": "2022-10-12T15:40:53Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "9d692dcd761433091acef9e0931c8090b50323a8",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-6",
+      "headRefOid": "59de53531f9a3b46e97bc3f3f844b683c80042f8",
+      "closedAt": "2022-10-12T15:40:53Z",
+      "mergedAt": "2022-10-12T15:40:53Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "b79a9a1424fa2007be6f8479a92035682572c966"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 32,
+      "id": "PR_kwDOG3oZ-85COgAt",
+      "title": "Update gateway config fetch example to use well-known",
+      "url": "https://github.com/ietf-wg-ohai/draft-ohai-svcb-config/pull/32",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Since in the discovery case, clients will generally use the well-known, that should be in the example",
+      "createdAt": "2022-11-04T17:02:24Z",
+      "updatedAt": "2022-11-05T22:29:05Z",
+      "baseRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "baseRefName": "main",
+      "baseRefOid": "d45fdb433da3947171fa0375ef04b11ee14ff890",
+      "headRepository": "ietf-wg-ohai/draft-ohai-svcb-config",
+      "headRefName": "tfpauly-patch-7",
+      "headRefOid": "42d1055a093f2997d28468298fc119311e2c0291",
+      "closedAt": "2022-11-05T22:29:05Z",
+      "mergedAt": "2022-11-05T22:29:04Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "3bdfed3919a1fdf0e47c4cd966af664fcef08b6b"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
