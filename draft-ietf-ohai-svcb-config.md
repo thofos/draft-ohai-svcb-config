@@ -132,7 +132,7 @@ list to ensure that clients that do not support access via Oblivious HTTP
 do not try to use the service. Services that mark the "ohttp"
 parameter as mandatory can, therefore, indicate that the service might
 not be accessible except through Oblivious HTTP. Services that
-support access both with and without Oblivious HTTP SHOULD NOT mark 
+support access both with and without Oblivious HTTP SHOULD NOT mark
 the "ohttp" parameter as mandatory, since that will prevent clients that
 do not understand the "ohttp" parameter from using the service. Note
 that since multiple SVCB responses can be provided for
