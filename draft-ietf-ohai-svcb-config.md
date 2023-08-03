@@ -131,9 +131,11 @@ The "ohttp" parameter can be included in the mandatory parameter
 list to ensure that clients that do not support access via Oblivious HTTP
 do not try to use the service. Services that mark the "ohttp"
 parameter as mandatory can, therefore, indicate that the service might
-not be accessible except through Oblivious HTTP. Services that optionally
-support access using Oblivious HTTP SHOULD NOT mark the "ohttp" parameter
-as mandatory. Note that since multiple SVCB responses can be provided for
+not be accessible except through Oblivious HTTP. Services that
+support access both with and without Oblivious HTTP SHOULD NOT mark 
+the "ohttp" parameter as mandatory, since that will prevent clients that
+do not understand the "ohttp" parameter from using the service. Note
+that since multiple SVCB responses can be provided for
 a single query, the oblivious and non-oblivious versions of a single
 service can have different SVCB records to support different names or properties.
 
