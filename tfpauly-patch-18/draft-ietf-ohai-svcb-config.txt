@@ -5,8 +5,8 @@
 Oblivious HTTP Application Intermediation                       T. Pauly
 Internet-Draft                                                Apple Inc.
 Intended status: Standards Track                                T. Reddy
-Expires: 4 February 2024                                           Nokia
-                                                           3 August 2023
+Expires: 6 February 2024                                           Nokia
+                                                           5 August 2023
 
 
       Discovery of Oblivious Services via Service Binding Records
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 February 2024.
+   This Internet-Draft will expire on 6 February 2024.
 
 Copyright Notice
 
@@ -183,18 +183,14 @@ Table of Contents
    Both the presentation and wire format values for the "ohttp"
    parameter MUST be empty.
 
-   The "ohttp" parameter can be included in the mandatory parameter list
-   to ensure that clients that do not support access via Oblivious HTTP
-   do not try to use the service.  Services that mark the "ohttp"
-   parameter as mandatory can, therefore, indicate that the service
-   might not be accessible except through Oblivious HTTP.  Services that
-   support access both with and without Oblivious HTTP SHOULD NOT mark
-   the "ohttp" parameter as mandatory, since that will prevent clients
-   that do not understand the "ohttp" parameter from using the service.
-   Note that since multiple SVCB responses can be provided for a single
-   query, the oblivious and non-oblivious versions of a single service
-   can have different SVCB records to support different names or
-   properties.
+   Services can include the "ohttp" parameter in the mandatory parameter
+   list if the service is only accessible using Oblivious HTTP.  Marking
+   the "ohttp" parameter as mandatory will cause clients that do not
+   understand the parameter to ignore that SVCB record.  Including the
+   "ohttp" parameter without marking it mandatory advertises a service
+   that is optionally available using Oblivious HTTP.  Note also that
+   multiple SVCB records can be provided to indicate separate
+   configurations.
 
    The media type to use for encapsulated requests made to a target
    service depends on the scheme of the SVCB record.  This document

@@ -14,18 +14,18 @@ HTTP, by offering an Oblivious Gateway Resource through which to access the
 target. This document also defines a mechanism to learn the key configuration
 of the discovered Oblivious Gateway Resource. 
     " name="description">
-<meta content="xml2rfc 3.17.4" name="generator">
+<meta content="xml2rfc 3.17.5" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-ohai-svcb-config-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.17.4
+  xml2rfc 3.17.5
     Python 3.11.4
     ConfigArgParse 1.5.3
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.3
-    platformdirs 3.9.1
+    platformdirs 3.10.0
     pycountry 22.3.5
     PyYAML 6.0
     requests 2.31.0
@@ -1056,7 +1056,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly &amp; Reddy</td>
-<td class="center">Expires 4 February 2024</td>
+<td class="center">Expires 6 February 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1069,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-ohai-svcb-config-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-08-03" class="published">3 August 2023</time>
+<time datetime="2023-08-05" class="published">5 August 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-02-04">4 February 2024</time></dd>
+<dd class="expires"><time datetime="2024-02-06">6 February 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1131,7 +1131,7 @@ of the discovered Oblivious Gateway Resource.<a href="#section-abstract-1" class
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 February 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 February 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1330,17 +1330,14 @@ key configuration (both of which can be retrieved using the method described in
 <a href="#config-fetch" class="auto internal xref">Section 6</a>).<a href="#section-4-2" class="pilcrow">¶</a></p>
 <p id="section-4-3">Both the presentation and wire format values for the "ohttp" parameter
 <span class="bcp14">MUST</span> be empty.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">The "ohttp" parameter can be included in the mandatory parameter
-list to ensure that clients that do not support access via Oblivious HTTP
-do not try to use the service. Services that mark the "ohttp"
-parameter as mandatory can, therefore, indicate that the service might
-not be accessible except through Oblivious HTTP. Services that
-support access both with and without Oblivious HTTP <span class="bcp14">SHOULD NOT</span> mark
-the "ohttp" parameter as mandatory, since that will prevent clients that
-do not understand the "ohttp" parameter from using the service. Note
-that since multiple SVCB responses can be provided for
-a single query, the oblivious and non-oblivious versions of a single
-service can have different SVCB records to support different names or properties.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-4">Services can include the "ohttp" parameter in the mandatory parameter
+list if the service is only accessible using Oblivious HTTP. Marking
+the "ohttp" parameter as mandatory will cause clients that do not
+understand the parameter to ignore that SVCB record.
+Including the "ohttp" parameter without marking it mandatory advertises
+a service that is optionally available using Oblivious HTTP. Note also
+that multiple SVCB records can be provided to indicate separate
+configurations.<a href="#section-4-4" class="pilcrow">¶</a></p>
 <p id="section-4-5">The media type to use for encapsulated requests made to a target service
 depends on the scheme of the SVCB record. This document defines the
 interpretation for the "https" <span>[<a href="#SVCB" class="cite xref">SVCB</a>]</span> and "dns" <span>[<a href="#DNS-SVCB" class="cite xref">DNS-SVCB</a>]</span>
