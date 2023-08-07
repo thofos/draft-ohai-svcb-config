@@ -407,17 +407,18 @@ Table of Contents
 
 8.1.  SVCB Service Parameter
 
-   IANA is requested to add the following entry to the SVCB Service
-   Parameters registry ([SVCB]).
+   This document adds the following entry to the SVCB Service Parameters
+   registry ([SVCB]).
 
-     +========+=======+=================================+===========+
-     | Number | Name  | Meaning                         | Reference |
-     +========+=======+=================================+===========+
-     | TBD    | ohttp | Denotes that a service operates | (This     |
-     |        |       | an Oblivious HTTP target        | document) |
-     +--------+-------+---------------------------------+-----------+
+   +=============+=======+=================================+===========+
+   | Number      | Name  | Meaning                         | Reference |
+   +=============+=======+=================================+===========+
+   | 8 (Early    | ohttp | Denotes that a                  | (This     |
+   | Allocation) |       | service operates an             | document) |
+   |             |       | Oblivious HTTP target           |           |
+   +-------------+-------+---------------------------------+-----------+
 
-                                 Table 1
+                                  Table 1
 
 8.2.  Well-Known URI
 
