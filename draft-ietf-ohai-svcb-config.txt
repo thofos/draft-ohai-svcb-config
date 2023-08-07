@@ -5,8 +5,8 @@
 Oblivious HTTP Application Intermediation                       T. Pauly
 Internet-Draft                                                Apple Inc.
 Intended status: Standards Track                                T. Reddy
-Expires: 21 December 2023                                          Nokia
-                                                            19 June 2023
+Expires: 8 February 2024                                           Nokia
+                                                           7 August 2023
 
 
       Discovery of Oblivious Services via Service Binding Records
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 December 2023.
+   This Internet-Draft will expire on 8 February 2024.
 
 Copyright Notice
 
@@ -183,16 +183,14 @@ Table of Contents
    Both the presentation and wire format values for the "ohttp"
    parameter MUST be empty.
 
-   The "ohttp" parameter can be included in the mandatory parameter list
-   to ensure that clients that do not support access via Oblivious HTTP
-   do not try to use the service.  Services that mark the "ohttp"
-   parameter as mandatory can, therefore, indicate that the service
-   might not be accessible except through Oblivious HTTP.  Services that
-   optionally support access using Oblivious HTTP SHOULD NOT mark the
-   "ohttp" parameter as mandatory.  Note that since multiple SVCB
-   responses can be provided for a single query, the oblivious and non-
-   oblivious versions of a single service can have different SVCB
-   records to support different names or properties.
+   Services can include the "ohttp" parameter in the mandatory parameter
+   list if the service is only accessible using Oblivious HTTP.  Marking
+   the "ohttp" parameter as mandatory will cause clients that do not
+   understand the parameter to ignore that SVCB record.  Including the
+   "ohttp" parameter without marking it mandatory advertises a service
+   that is optionally available using Oblivious HTTP.  Note also that
+   multiple SVCB records can be provided to indicate separate
+   configurations.
 
    The media type to use for encapsulated requests made to a target
    service depends on the scheme of the SVCB record.  This document
@@ -460,9 +458,9 @@ Table of Contents
 
    [DNS-SVCB] Schwartz, B. M., "Service Binding Mapping for DNS
               Servers", Work in Progress, Internet-Draft, draft-ietf-
-              add-svcb-dns-08, 14 March 2023,
+              add-svcb-dns-09, 26 June 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-add-
-              svcb-dns-08>.
+              svcb-dns-09>.
 
    [DOH]      Hoffman, P. and P. McManus, "DNS Queries over HTTPS
               (DoH)", RFC 8484, DOI 10.17487/RFC8484, October 2018,
@@ -474,9 +472,9 @@ Table of Contents
               <https://www.rfc-editor.org/rfc/rfc9110>.
 
    [OHTTP]    Thomson, M. and C. A. Wood, "Oblivious HTTP", Work in
-              Progress, Internet-Draft, draft-ietf-ohai-ohttp-08, 15
-              March 2023, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-ohai-ohttp-08>.
+              Progress, Internet-Draft, draft-ietf-ohai-ohttp-09, 27
+              July 2023, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-ohai-ohttp-09>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -504,9 +502,9 @@ Table of Contents
    [CONSISTENCY]
               Davidson, A., Finkel, M., Thomson, M., and C. A. Wood,
               "Key Consistency and Discovery", Work in Progress,
-              Internet-Draft, draft-ietf-privacypass-key-consistency-00,
-              24 October 2022, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-privacypass-key-consistency-00>.
+              Internet-Draft, draft-ietf-privacypass-key-consistency-01,
+              10 July 2023, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-privacypass-key-consistency-01>.
 
    [DNSSEC]   Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements",
