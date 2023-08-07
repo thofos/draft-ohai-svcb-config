@@ -353,12 +353,12 @@ value, such as the commonly used "/dns-query{?dns}".
 
 ## SVCB Service Parameter
 
-IANA is requested to add the following entry to the SVCB Service Parameters
+This document adds the following entry to the SVCB Service Parameters
 registry ({{SVCB}}).
 
 | Number  | Name           | Meaning                            | Reference       |
 | ------- | -------------- | ---------------------------------- | --------------- |
-| TBD     | ohttp          | Denotes that a service operates an Oblivious HTTP target  | (This document) |
+| 8 (Early Allocation)     | ohttp          | Denotes that a service operates an Oblivious HTTP target  | (This document) |
 
 ## Well-Known URI
 
