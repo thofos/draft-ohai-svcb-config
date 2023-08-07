@@ -127,15 +127,14 @@ key configuration (both of which can be retrieved using the method described in
 Both the presentation and wire format values for the "ohttp" parameter
 MUST be empty.
 
-The "ohttp" parameter can be included in the mandatory parameter
-list to ensure that clients that do not support access via Oblivious HTTP
-do not try to use the service. Services that mark the "ohttp"
-parameter as mandatory can, therefore, indicate that the service might
-not be accessible except through Oblivious HTTP. Services that optionally
-support access using Oblivious HTTP SHOULD NOT mark the "ohttp" parameter
-as mandatory. Note that since multiple SVCB responses can be provided for
-a single query, the oblivious and non-oblivious versions of a single
-service can have different SVCB records to support different names or properties.
+Services can include the "ohttp" parameter in the mandatory parameter
+list if the service is only accessible using Oblivious HTTP. Marking
+the "ohttp" parameter as mandatory will cause clients that do not
+understand the parameter to ignore that SVCB record.
+Including the "ohttp" parameter without marking it mandatory advertises
+a service that is optionally available using Oblivious HTTP. Note also
+that multiple SVCB records can be provided to indicate separate
+configurations.
 
 The media type to use for encapsulated requests made to a target service
 depends on the scheme of the SVCB record. This document defines the
