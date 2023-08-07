@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Discovery of Oblivious Services via Service Binding Records</title>
+<meta content="Tommy Pauly" name="author">
+<meta content="Tirumaleswar Reddy" name="author">
+<meta content="
+       This document defines a parameter that can be included in SVCB and HTTPS
+DNS resource records to denote that a service is accessible using Oblivious
+HTTP, by offering an Oblivious Gateway Resource through which to access the
+target. This document also defines a mechanism to learn the key configuration
+of the discovered Oblivious Gateway Resource. 
+    " name="description">
+<meta content="xml2rfc 3.17.5" name="generator">
+<meta content="Internet-Draft" name="keyword">
+<meta content="draft-ietf-ohai-svcb-config-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.17.5
+    Python 3.11.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.3
+    platformdirs 3.10.0
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.31.0
+    setuptools 67.7.2
+    six 1.16.0
+    wcwidth 0.2.6
+-->
+<link href="draft-ietf-ohai-svcb-config.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+  margin-right: 1ch;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 12ch !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Oblivious Services in SVCB</td>
+<td class="right">August 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Pauly &amp; Reddy</td>
+<td class="center">Expires 8 February 2024</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Oblivious HTTP Application Intermediation</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ietf-ohai-svcb-config-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-08-07" class="published">7 August 2023</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2024-02-08">8 February 2024</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">T. Pauly</div>
+<div class="org">Apple Inc.</div>
+</div>
+<div class="author">
+      <div class="author-name">T. Reddy</div>
+<div class="org">Nokia</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Discovery of Oblivious Services via Service Binding Records</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines a parameter that can be included in SVCB and HTTPS
+DNS resource records to denote that a service is accessible using Oblivious
+HTTP, by offering an Oblivious Gateway Resource through which to access the
+target. This document also defines a mechanism to learn the key configuration
+of the discovered Oblivious Gateway Resource.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ietf-ohai-svcb-config/">https://datatracker.ietf.org/doc/draft-ietf-ohai-svcb-config/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Oblivious HTTP Application Intermediation Working Group mailing list (<span><a href="mailto:ohai@ietf.org">mailto:ohai@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/ohai/">https://mailarchive.ietf.org/arch/browse/ohai/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/ohai/">https://www.ietf.org/mailman/listinfo/ohai/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/ietf-wg-ohai/draft-ohai-svcb-config">https://github.com/ietf-wg-ohai/draft-ohai-svcb-config</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 8 February 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2023 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-applicability" class="internal xref">Applicability</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-the-ohttp-svcparamkey" class="internal xref">The ohttp SvcParamKey</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-use-in-https-service-record" class="internal xref">Use in HTTPS service records</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-use-in-dns-server-svcb-reco" class="internal xref">Use in DNS server SVCB records</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-use-with-ddr" class="internal xref">Use with DDR</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.2">
+                    <p id="section-toc.1-1.4.2.2.2.2.1"><a href="#section-4.2.2" class="auto internal xref">4.2.2</a>.  <a href="#name-use-with-dnr" class="internal xref">Use with DNR</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-gateway-location" class="internal xref">Gateway Location</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-key-configuration-fetching" class="internal xref">Key Configuration Fetching</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-and-privacy-consid" class="internal xref">Security and Privacy Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-key-targeting-attacks" class="internal xref">Key Targeting Attacks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-dohpath-targeting-attacks" class="internal xref">dohpath Targeting Attacks</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-svcb-service-parameter" class="internal xref">SVCB Service Parameter</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-well-known-uri" class="internal xref">Well-Known URI</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">Oblivious HTTP <span>[<a href="#OHTTP" class="cite xref">OHTTP</a>]</span> allows clients to encrypt
+messages exchanged with an Oblivious Target Resource (target). The messages
+are encapsulated in encrypted messages to an Oblivious Gateway Resource
+(gateway), which gates access to the target. The gateway is accessed via an
+Oblivious Relay Resource (relay), which proxies the encapsulated messages
+to hide the identity of the client. Overall, this architecture is designed
+in such a way that the relay cannot inspect the contents of messages, and
+the gateway and target cannot learn the client's identity from a single
+transaction.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Since Oblivious HTTP deployments typically involve very specific coordination
+between clients, relays, and gateways, the key configuration is often shared
+in a bespoke fashion. However, some deployments involve clients
+discovering targets and their associated gateways more dynamically.
+For example, a network might operate a DNS resolver that provides more optimized
+or more relevant DNS answers and is accessible using Oblivious HTTP, and might
+want to advertise support for Oblivious HTTP via mechanisms like Discovery of
+Designated Resolvers (<span>[<a href="#DDR" class="cite xref">DDR</a>]</span>). Clients can access these
+gateways through trusted relays.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document defines a way to use DNS records to advertise that an HTTP service
+supports Oblivious HTTP. This advertisement is a parameter that can be included in SVCB
+and HTTPS DNS resource records <span>[<a href="#SVCB" class="cite xref">SVCB</a>]</span> (<a href="#svc-param" class="auto internal xref">Section 4</a>).
+The presence of this parameter indicates that a service can act as a target and
+has a gateway that can provide access to the target.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">The client learns the URI to use for the gateway using a well-known
+URI <span>[<a href="#WELLKNOWN" class="cite xref">WELLKNOWN</a>]</span>, "ohttp-gateway", which is accessed on the
+target (<a href="#gateway-location" class="auto internal xref">Section 5</a>). This means that for deployments that
+support this kind of discovery, the gateway and target resources need to
+be located on the same host.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">This document also defines a way to fetch an gateway's key
+configuration from the gateway (<a href="#config-fetch" class="auto internal xref">Section 6</a>).<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">This mechanism does not aid in the discovery of relays;
+relay configuration is out of scope for this document. Models in which
+this discovery mechanism is applicable are described in <a href="#applicability" class="auto internal xref">Section 3</a>.<a href="#section-1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="applicability">
+<section id="section-3">
+      <h2 id="name-applicability">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-applicability" class="section-name selfRef">Applicability</a>
+      </h2>
+<p id="section-3-1">There are multiple models in which the discovery mechanism defined
+in this document can be used.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-2.1">Upgrading regular (non-proxied) HTTP to Oblivious HTTP. In this model,
+the client intends to communicate with a specific target service, and
+prefers to use Oblivious HTTP if it is available. The target service
+has a gateway that it offers to allow access using Oblivious
+HTTP. Once the client learns about the gateway, it "upgrades"
+to using Oblivious HTTP to access the target service.<a href="#section-3-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-3-2.2">Discovering alternative Oblivious HTTP services. In this model,
+the client has a default target service that it uses. For
+example, this may be a public DNS resolver that is accessible over
+Oblivious HTTP. The client is willing to use alternative
+target services if they are discovered, which may provide more
+optimized or more relevant responses.<a href="#section-3-2.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-3-3">In both of these deployment models, the client is configured with
+a relay that it trusts for Oblivious HTTP transactions. This
+relay either needs to provide generic access to gateways, or
+provide a service to clients to allow them to check which gateways
+are accessible.<a href="#section-3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="svc-param">
+<section id="section-4">
+      <h2 id="name-the-ohttp-svcparamkey">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-the-ohttp-svcparamkey" class="section-name selfRef">The ohttp SvcParamKey</a>
+      </h2>
+<p id="section-4-1">The "ohttp" SvcParamKey (<a href="#iana" class="auto internal xref">Section 8</a>) is used to indicate that a
+service described in an SVCB record can be accessed as a target
+using an associated gateway. The service that is queried by the client hosts
+one or more target resources.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">In order to access the service's target resources using Oblivious HTTP, the client
+needs to send encapsulated messages to the gateway resource and the gateway's
+key configuration (both of which can be retrieved using the method described in
+<a href="#config-fetch" class="auto internal xref">Section 6</a>).<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">Both the presentation and wire format values for the "ohttp" parameter
+<span class="bcp14">MUST</span> be empty.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">Services can include the "ohttp" parameter in the mandatory parameter
+list if the service is only accessible using Oblivious HTTP. Marking
+the "ohttp" parameter as mandatory will cause clients that do not
+understand the parameter to ignore that SVCB record.
+Including the "ohttp" parameter without marking it mandatory advertises
+a service that is optionally available using Oblivious HTTP. Note also
+that multiple SVCB records can be provided to indicate separate
+configurations.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">The media type to use for encapsulated requests made to a target service
+depends on the scheme of the SVCB record. This document defines the
+interpretation for the "https" <span>[<a href="#SVCB" class="cite xref">SVCB</a>]</span> and "dns" <span>[<a href="#DNS-SVCB" class="cite xref">DNS-SVCB</a>]</span>
+schemes. Other schemes that want to use this parameter <span class="bcp14">MUST</span> define the
+interpretation and meaning of the configuration.<a href="#section-4-5" class="pilcrow">¶</a></p>
+<div id="use-in-https-service-records">
+<section id="section-4.1">
+        <h3 id="name-use-in-https-service-record">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-use-in-https-service-record" class="section-name selfRef">Use in HTTPS service records</a>
+        </h3>
+<p id="section-4.1-1">For the "https" scheme, which uses the HTTPS RR type instead of SVCB,
+the presence of the "ohttp" parameter means that the target
+being described is an Oblivious HTTP service that is accessible using
+the default "message/bhttp" media type <span>[<a href="#OHTTP" class="cite xref">OHTTP</a>]</span>
+          <span>[<a href="#BINARY-HTTP" class="cite xref">BINARY-HTTP</a>]</span>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">For example, an HTTPS service record for svc.example.com that supports
+a Oblivious HTTP could look like this:<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.1-3">
+<pre>
+svc.example.com. 7200  IN HTTPS 1 . ( alpn=h2 ohttp )
+</pre><a href="#section-4.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-4.1-4">A similar record for a service that only supports Oblivious HTTP
+could look like this:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.1-5">
+<pre>
+svc.example.com. 7200  IN HTTPS 1 . ( mandatory=ohttp ohttp )
+</pre><a href="#section-4.1-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="use-in-dns-server-svcb-records">
+<section id="section-4.2">
+        <h3 id="name-use-in-dns-server-svcb-reco">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-use-in-dns-server-svcb-reco" class="section-name selfRef">Use in DNS server SVCB records</a>
+        </h3>
+<p id="section-4.2-1">For the "dns" scheme, as defined in <span>[<a href="#DNS-SVCB" class="cite xref">DNS-SVCB</a>]</span>, the presence of
+the "ohttp" parameter means that the DNS server being
+described has a DNS over HTTP (DoH) <span>[<a href="#DOH" class="cite xref">DOH</a>]</span> service that can
+be accessed using Oblivious HTTP. Requests to the resolver are sent to
+the gateway using binary HTTP with the default "message/bhttp"
+media type <span>[<a href="#BINARY-HTTP" class="cite xref">BINARY-HTTP</a>]</span>, containing inner requests that use the
+"application/dns-message" media type <span>[<a href="#DOH" class="cite xref">DOH</a>]</span>.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">If the "ohttp" parameter is included in an DNS server SVCB record,
+the "alpn" <span class="bcp14">MUST</span> include at least one HTTP value (such as "h2" or
+"h3").<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">In order for DoH-capable recursive resolvers to function as Oblivious HTTP targets, their
+associated gateways need to be accessible via a client-trusted relay.
+DoH recursive resolvers used with the discovery mechanisms described
+in this section can either be publicly accessible, or specific to a
+network. In general, only publicly accessible DoH recursive resolvers will work
+as Oblivious HTTP targets, unless there is a coordinated deployment
+with a relay to access the network-specific DoH recursive resolvers.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<div id="ddr">
+<section id="section-4.2.1">
+          <h4 id="name-use-with-ddr">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-use-with-ddr" class="section-name selfRef">Use with DDR</a>
+          </h4>
+<p id="section-4.2.1-1">Clients can discover that a DoH recursive resolvers support Oblivious HTTP using
+DDR, either by querying _dns.resolver.arpa to a locally configured
+resolver or by querying using the name of a resolver <span>[<a href="#DDR" class="cite xref">DDR</a>]</span>.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-2">For example, a DoH service advertised over DDR can be annotated
+as supporting resolution via Oblivious HTTP using the following record:<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.1-3">
+<pre>
+_dns.resolver.arpa  7200  IN SVCB 1 doh.example.net (
+     alpn=h2 dohpath=/dns-query{?dns} ohttp )
+</pre><a href="#section-4.2.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-4.2.1-4">Clients still need to perform verification of oblivious DoH servers,
+specifically the TLS certificate checks described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-add-ddr-10#section-4.2" class="relref">Section 4.2</a> of [<a href="#DDR" class="cite xref">DDR</a>]</span>.
+Since the gateway and target resources for discovered oblivious services
+need to be on the same host, this means that the client needs to verify
+that the certificate presented by the gateway passes the required checks.
+These checks can be performed when looking up the configuration on the gateway
+as described in <a href="#config-fetch" class="auto internal xref">Section 6</a>, which can either be done directly
+or via the relay or another proxy to avoid exposing client IP addresses.<a href="#section-4.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-5">Opportunistic discovery <span>[<a href="#DDR" class="cite xref">DDR</a>]</span>, where only the IP address is validated,
+<span class="bcp14">SHOULD NOT</span> be used in general with Oblivious HTTP, since this mode
+primarily exists to support resolvers that use private or local IP
+addresses, which will usually not be accessible when using a
+relay. If a configuration occurs where the resolver is accessible, but
+cannot use certificate-based validation, the client needs to ensure
+that the relay only accesses the gateway and target using
+the unencrypted resolver's original IP address.<a href="#section-4.2.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-6">For the case of DoH recursive resolvers, clients also need to ensure that they are not
+being targeted with unique DoH paths that would reveal their identity. See
+<a href="#security" class="auto internal xref">Section 7</a> for more discussion.<a href="#section-4.2.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="dnr">
+<section id="section-4.2.2">
+          <h4 id="name-use-with-dnr">
+<a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-use-with-dnr" class="section-name selfRef">Use with DNR</a>
+          </h4>
+<p id="section-4.2.2-1">The SvcParamKeys defined in this document also can be used with Discovery
+of Network-designated Resolvers (DNR) <span>[<a href="#DNR" class="cite xref">DNR</a>]</span>. In this
+case, the oblivious configuration and path parameters can be included
+in DHCP and Router Advertisement messages.<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.2-2">While DNR does not require the same kind of verification as DDR, clients
+that learn about DoH recursive resolvers still need to ensure that they are not being
+targeted with unique DoH paths that would reveal their identity. See <a href="#security" class="auto internal xref">Section 7</a>
+for more discussion.<a href="#section-4.2.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="gateway-location">
+<section id="section-5">
+      <h2 id="name-gateway-location">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-gateway-location" class="section-name selfRef">Gateway Location</a>
+      </h2>
+<p id="section-5-1">Once a client has discovered that a service supports Oblivious HTTP
+via the "ohttp" parameter in a SVCB or HTTPS record, it needs to be
+able to send requests via a relay to the correct gateway location.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">By default, the gateway for a target is defined as a well-known
+resource (<span>[<a href="#WELLKNOWN" class="cite xref">WELLKNOWN</a>]</span>) on the target, "/.well-known/ohttp-gateway".<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">Some servers might not want to operate the gateway on a well-known URI.
+In such cases, these servers can use 3xx redirection responses
+(<span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.4" class="relref">Section 15.4</a> of [<a href="#HTTP" class="cite xref">HTTP</a>]</span>) to direct clients and relays to the correct
+location of the gateway. Such redirects would apply both to requests
+made to fetch key configurations (as defined in <a href="#config-fetch" class="auto internal xref">Section 6</a>) and to
+encapsulated requests made via a relay.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">If a client receives a redirect when fetching the key configuration from the
+well-known gateway resource, it <span class="bcp14">MUST NOT</span> communicate the redirected
+gateway URI to the relay as the location of the gateway to use.
+Doing so would allow the gateway to target clients by encoding
+unique or client-identifying values in the redirected URI. Instead,
+relays being used with dynamically discovered gateways <span class="bcp14">MUST</span> use the
+well-known gateway resource and follow any redirects independently of
+redirects that clients received. The relay can remember such redirects
+across oblivious requests for all clients in order to avoid added latency.<a href="#section-5-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="config-fetch">
+<section id="section-6">
+      <h2 id="name-key-configuration-fetching">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-key-configuration-fetching" class="section-name selfRef">Key Configuration Fetching</a>
+      </h2>
+<p id="section-6-1">Clients also need to know the key configuration of a gateway before encapsulating
+and sending requests to the relay.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">In order to fetch the key configuration of a gateway discovered
+in the manner described in <a href="#gateway-location" class="auto internal xref">Section 5</a>, the client issues a GET request
+to the URI of the gateway specifying the "application/ohttp-keys" (<span>[<a href="#OHTTP" class="cite xref">OHTTP</a>]</span>)
+media type in the Accept header.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">For example, if the client knows an oblivious gateway URI,
+"https://svc.example.com/.well-known/ohttp-gateway", it could fetch the
+key configuration with the following request:<a href="#section-6-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6-4">
+<pre>
+GET /.well-known/ohttp-gateway HTTP/1.1
+Host: svc.example.com
+Accept: application/ohttp-keys
+</pre><a href="#section-6-4" class="pilcrow">¶</a>
+</div>
+<p id="section-6-5">Gateways that coordinate with targets that advertise Oblivious HTTP
+support <span class="bcp14">SHOULD</span> support GET requests for their key configuration in this
+manner, unless there is another out-of-band configuration model that is
+usable by clients. Gateways respond with their key configuration in the
+response body, with a content type of "application/ohttp-keys".<a href="#section-6-5" class="pilcrow">¶</a></p>
+<p id="section-6-6">Clients can either fetch this key configuration directly, or do so via
+a proxy in order to avoid the server discovering information about the
+client's identity. See <a href="#consistency" class="auto internal xref">Section 7.1</a> for more discussion of avoiding key
+targeting attacks.<a href="#section-6-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="security">
+<section id="section-7">
+      <h2 id="name-security-and-privacy-consid">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-and-privacy-consid" class="section-name selfRef">Security and Privacy Considerations</a>
+      </h2>
+<p id="section-7-1">Attackers on a network can remove SVCB information from cleartext DNS
+answers that are not protected by DNSSEC <span>[<a href="#DNSSEC" class="cite xref">DNSSEC</a>]</span>. This
+can effectively downgrade clients. However, since SVCB indications
+for Oblivious HTTP support are just hints, a client can mitigate this by
+always checking for a gateway configuration <a href="#config-fetch" class="auto internal xref">Section 6</a>
+on the well-known gateway location <a href="#gateway-location" class="auto internal xref">Section 5</a>.
+Use of encrypted DNS along with DNSSEC can also be used as a mitigation.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">When clients fetch a gateway's configuration (<a href="#config-fetch" class="auto internal xref">Section 6</a>),
+they can expose their identity in the form of an IP address if they do not
+connect via a proxy or some other IP-hiding mechanism. In some circumstances,
+this might not be a privacy concern, since revealing that a particular
+client IP address is preparing to use an Oblivious HTTP service can be
+expected. However, if a client is otherwise trying to hide its IP
+address or location (and not merely decouple its specific requests from its
+IP address), or if revealing its IP address facilitates key targeting attacks
+(if a gateway service uses IP addresses to associate specific configurations
+with specific clients), a proxy or similar mechanism can be used to fetch
+the gateway's configuration.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">When discovering designated oblivious DoH recursive resolvers using this mechanism,
+clients need to ensure that the designation is trusted in lieu of
+being able to directly check the contents of the gateway server's TLS
+certificate. See <a href="#ddr" class="auto internal xref">Section 4.2.1</a> for more discussion, as well as the Security
+Considerations of <span>[<a href="#DNS-SVCB" class="cite xref">DNS-SVCB</a>]</span>.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<div id="consistency">
+<section id="section-7.1">
+        <h3 id="name-key-targeting-attacks">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-key-targeting-attacks" class="section-name selfRef">Key Targeting Attacks</a>
+        </h3>
+<p id="section-7.1-1">As discussed in <span>[<a href="#OHTTP" class="cite xref">OHTTP</a>]</span>, client requests using Oblivious HTTP
+can only be linked by recognizing the key configuration. In order to
+prevent unwanted linkability and tracking, clients using any key
+configuration discovery mechanism need to be concerned with attacks
+that target a specific user or population with a unique key configuration.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">There are several approaches clients can use to mitigate key targeting
+attacks. <span>[<a href="#CONSISTENCY" class="cite xref">CONSISTENCY</a>]</span> provides an overview
+of the options for ensuring the key configurations are consistent between
+different clients. Clients <span class="bcp14">SHOULD</span> employ some technique to mitigate key
+targeting attacks, such as the option of confirming the key with a shared
+proxy as described in <span>[<a href="#CONSISTENCY" class="cite xref">CONSISTENCY</a>]</span>. If a client detects that a gateway
+is using per-client targeted key configuration, the client can stop using
+the gateway, and potentially report the targeting attack to let other
+clients avoid using this gateway in the future.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="dohpath-targeting-attacks">
+<section id="section-7.2">
+        <h3 id="name-dohpath-targeting-attacks">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-dohpath-targeting-attacks" class="section-name selfRef">dohpath Targeting Attacks</a>
+        </h3>
+<p id="section-7.2-1">For oblivious DoH servers, an attacker could use unique <code>dohpath</code> values
+to target or identify specific clients. This attack is very similar to
+the generic OHTTP key targeting attack described above.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">Clients <span class="bcp14">SHOULD</span> mitigate such attacks. This can be done with a
+check for consistency, such as using a mechanism described in <span>[<a href="#CONSISTENCY" class="cite xref">CONSISTENCY</a>]</span>
+to validate the <code>dohpath</code> value with another source. It can also be
+done by limiting the the allowable values of <code>dohpath</code> to a single
+value, such as the commonly used "/dns-query{?dns}".<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana">
+<section id="section-8">
+      <h2 id="name-iana-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="svcb-service-parameter">
+<section id="section-8.1">
+        <h3 id="name-svcb-service-parameter">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-svcb-service-parameter" class="section-name selfRef">SVCB Service Parameter</a>
+        </h3>
+<p id="section-8.1-1">This document adds the following entry to the SVCB Service Parameters
+registry (<span>[<a href="#SVCB" class="cite xref">SVCB</a>]</span>).<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+          <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Number</th>
+              <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Meaning</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">8 (Early Allocation)</td>
+              <td class="text-left" rowspan="1" colspan="1">ohttp</td>
+              <td class="text-left" rowspan="1" colspan="1">Denotes that a service operates an Oblivious HTTP target</td>
+              <td class="text-left" rowspan="1" colspan="1">(This document)</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="well-known-uri">
+<section id="section-8.2">
+        <h3 id="name-well-known-uri">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-well-known-uri" class="section-name selfRef">Well-Known URI</a>
+        </h3>
+<p id="section-8.2-1">IANA is requested to add one new entry in the "Well-Known URIs" registry <span>[<a href="#WELLKNOWN" class="cite xref">WELLKNOWN</a>]</span>.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">URI suffix: ohttp-gateway<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">Change controller: IETF<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">Specification document: This document<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-5">Status: permanent<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+<p id="section-8.2-6">Related information: N/A<a href="#section-8.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<section id="section-9">
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="BINARY-HTTP">[BINARY-HTTP]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Binary Representation of HTTP Messages"</span>, <span class="seriesInfo">RFC 9292</span>, <span class="seriesInfo">DOI 10.17487/RFC9292</span>, <time datetime="2022-08" class="refDate">August 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9292">https://www.rfc-editor.org/rfc/rfc9292</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DDR">[DDR]</dt>
+        <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Kinnear, E.</span>, <span class="refAuthor">Wood, C. A.</span>, <span class="refAuthor">McManus, P.</span>, and <span class="refAuthor">T. Jensen</span>, <span class="refTitle">"Discovery of Designated Resolvers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-add-ddr-10</span>, <time datetime="2022-08-05" class="refDate">5 August 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-add-ddr-10">https://datatracker.ietf.org/doc/html/draft-ietf-add-ddr-10</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DNR">[DNR]</dt>
+        <dd>
+<span class="refAuthor">Boucadair, M.</span>, <span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Wing, D.</span>, <span class="refAuthor">Cook, N.</span>, and <span class="refAuthor">T. Jensen</span>, <span class="refTitle">"DHCP and Router Advertisement Options for the Discovery of Network-designated Resolvers (DNR)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-add-dnr-16</span>, <time datetime="2023-04-27" class="refDate">27 April 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-add-dnr-16">https://datatracker.ietf.org/doc/html/draft-ietf-add-dnr-16</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DNS-SVCB">[DNS-SVCB]</dt>
+        <dd>
+<span class="refAuthor">Schwartz, B. M.</span>, <span class="refTitle">"Service Binding Mapping for DNS Servers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-add-svcb-dns-09</span>, <time datetime="2023-06-26" class="refDate">26 June 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-add-svcb-dns-09">https://datatracker.ietf.org/doc/html/draft-ietf-add-svcb-dns-09</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DOH">[DOH]</dt>
+        <dd>
+<span class="refAuthor">Hoffman, P.</span> and <span class="refAuthor">P. McManus</span>, <span class="refTitle">"DNS Queries over HTTPS (DoH)"</span>, <span class="seriesInfo">RFC 8484</span>, <span class="seriesInfo">DOI 10.17487/RFC8484</span>, <time datetime="2018-10" class="refDate">October 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8484">https://www.rfc-editor.org/rfc/rfc8484</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP">[HTTP]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OHTTP">[OHTTP]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Oblivious HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ohai-ohttp-09</span>, <time datetime="2023-07-27" class="refDate">27 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-09">https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-09</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SVCB">[SVCB]</dt>
+        <dd>
+<span class="refAuthor">Schwartz, B. M.</span>, <span class="refAuthor">Bishop, M.</span>, and <span class="refAuthor">E. Nygren</span>, <span class="refTitle">"Service binding and parameter specification via the DNS (DNS SVCB and HTTPS RRs)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-dnsop-svcb-https-12</span>, <time datetime="2023-03-11" class="refDate">11 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-12">https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-12</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="WELLKNOWN">[WELLKNOWN]</dt>
+      <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Well-Known Uniform Resource Identifiers (URIs)"</span>, <span class="seriesInfo">RFC 8615</span>, <span class="seriesInfo">DOI 10.17487/RFC8615</span>, <time datetime="2019-05" class="refDate">May 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8615">https://www.rfc-editor.org/rfc/rfc8615</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="CONSISTENCY">[CONSISTENCY]</dt>
+        <dd>
+<span class="refAuthor">Davidson, A.</span>, <span class="refAuthor">Finkel, M.</span>, <span class="refAuthor">Thomson, M.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Key Consistency and Discovery"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-privacypass-key-consistency-01</span>, <time datetime="2023-07-10" class="refDate">10 July 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-key-consistency-01">https://datatracker.ietf.org/doc/html/draft-ietf-privacypass-key-consistency-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DNSSEC">[DNSSEC]</dt>
+      <dd>
+<span class="refAuthor">Arends, R.</span>, <span class="refAuthor">Austein, R.</span>, <span class="refAuthor">Larson, M.</span>, <span class="refAuthor">Massey, D.</span>, and <span class="refAuthor">S. Rose</span>, <span class="refTitle">"DNS Security Introduction and Requirements"</span>, <span class="seriesInfo">RFC 4033</span>, <span class="seriesInfo">DOI 10.17487/RFC4033</span>, <time datetime="2005-03" class="refDate">March 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4033">https://www.rfc-editor.org/rfc/rfc4033</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Tommy Pauly</span></div>
+<div dir="auto" class="left"><span class="org">Apple Inc.</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:tpauly@apple.com" class="email">tpauly@apple.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Tirumaleswar Reddy</span></div>
+<div dir="auto" class="left"><span class="org">Nokia</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:kondtir@gmail.com" class="email">kondtir@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
