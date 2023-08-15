@@ -76,7 +76,7 @@ target ({{gateway-location}}). This means that for deployments that
 support this kind of discovery, the gateway and target resources need to
 be located on the same host.
 
-This document also defines a way to fetch an gateway's key
+This document also defines a way to fetch a gateway's key
 configuration from the gateway ({{config-fetch}}).
 
 This mechanism does not aid in the discovery of relays;
@@ -106,7 +106,7 @@ Oblivious HTTP. The client is willing to use alternative
 target services if they are discovered, which may provide more
 optimized or more relevant responses.
 
-In both of these deployment models, the client is configured with
+In both deployment models, the client is configured with
 a relay that it trusts for Oblivious HTTP transactions. This
 relay either needs to provide generic access to gateways, or
 provide a service to clients to allow them to check which gateways
@@ -297,8 +297,8 @@ Attackers on a network can remove SVCB information from cleartext DNS
 answers that are not protected by DNSSEC {{?DNSSEC=RFC4033}}. This
 can effectively downgrade clients. However, since SVCB indications
 for Oblivious HTTP support are just hints, a client can mitigate this by
-always checking for a gateway configuration {{config-fetch}}
-on the well-known gateway location {{gateway-location}}.
+always checking for a gateway configuration ({{config-fetch}})
+on the well-known gateway location ({{gateway-location}}).
 Use of encrypted DNS along with DNSSEC can also be used as a mitigation.
 
 When clients fetch a gateway's configuration ({{config-fetch}}),
